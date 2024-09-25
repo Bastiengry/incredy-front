@@ -1,0 +1,57 @@
+{
+  "header": {
+    "menu": {
+      "addTopic": {
+        "label": "Add topic"
+      },
+      "home": {
+        "label": "Home"
+      },
+      "logout": {
+        "label": "Logout"
+      }
+    }
+  },
+  "topic": {
+    "editTopic": {
+      "buttons": {
+        "cancel": "Cancel",
+        "submit": "Submit"
+      },
+      "form": {
+        "titleField": {
+          "label": "Title of the story",
+          "placeHolder": "Enter a title here..."
+        },
+        "textField": {
+          "label": "Text of the story",
+          "placeHolder": "Enter your text here..."
+        }
+      },
+      "title": {
+        "add": "Creation of a topic",
+        "edit": "Edition of a topic"
+      }
+    },
+    "listTopics": {
+      "clear": "Clear",
+      "columns": {
+        "actions": "Actions",
+        "topic": "Topics"
+      },
+      "deleteConfirmDialog": {
+        "buttons": {
+          "no": "No",
+          "yes": "Yes"
+        },
+        "message": "Are you sure you want to delete topic \"{{topicToDelete}}\" ?",
+        "title": "Confirm"
+      },
+      "search": "Search",
+      "title": "List of all the available topics"
+    }
+  },
+  "notification": {
+    "success": "Data saved"
+  }
+}

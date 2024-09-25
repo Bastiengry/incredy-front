@@ -1,25 +1,23 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {RouterProvider} from 'react-router-dom';
+import {keycloak} from './security';
+import {ReactKeycloakProvider} from '@react-keycloak/web';
+import {PrimeReactProvider} from 'primereact/api';
+import 'primereact/resources/themes/viva-light/theme.css';
+import 'primereact/resources/primereact.min.css';
+import 'primeicons/primeicons.css';
+import {router} from './router';
+import {NotificationProvider} from './notification';
+import './i18next';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ReactKeycloakProvider authClient={keycloak}>
+      <PrimeReactProvider>
+        <NotificationProvider>
+          <RouterProvider router={router} />
+        </NotificationProvider>
+      </PrimeReactProvider>
+    </ReactKeycloakProvider>
   );
 }
 

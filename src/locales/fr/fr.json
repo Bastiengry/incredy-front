@@ -1,0 +1,57 @@
+{
+  "header": {
+    "menu": {
+      "addTopic": {
+        "label": "Ajouter un topic"
+      },
+      "home": {
+        "label": "Accueil"
+      },
+      "logout": {
+        "label": "Déconnexion"
+      }
+    }
+  },
+  "topic": {
+    "editTopic": {
+      "buttons": {
+        "cancel": "Annuler",
+        "submit": "Valider"
+      },
+      "form": {
+        "titleField": {
+          "label": "Titre du topic",
+          "placeHolder": "Entrez un titre ici..."
+        },
+        "textField": {
+          "label": "Texte du topic",
+          "placeHolder": "Entrez votre texte ici..."
+        }
+      },
+      "title": {
+        "add": "Creation d'un topic",
+        "edit": "Edition d'un topic"
+      }
+    },
+    "listTopics": {
+      "clear": "Effacer",
+      "columns": {
+        "actions": "Actions",
+        "topic": "Topics"
+      },
+      "deleteConfirmDialog": {
+        "buttons": {
+          "no": "Non",
+          "yes": "Oui"
+        },
+        "message": "Etes-vous sûr de vouloir supprimer le topic \"{{topicToDelete}}\" ?",
+        "title": "Confirmation"
+      },
+      "search": "Recherche",
+      "title": "Liste de tous les topics disponibles"
+    }
+  },
+  "notification": {
+    "success": "Modifications enregistrées"
+  }
+}

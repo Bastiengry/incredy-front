@@ -11,3 +11,29 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.user-button:focus {
+  box-shadow: unset;
+}
+
+.form-button-bar .p-button {
+  width: fit-content;
+}
+
+.incredy-form-buttons {
+  width: initial;
+}
+
+.topic-list-date {
+  text-align: right;
+  font-style: italic;
+  font-size: 12px;
+}
+
+.topic-list-title {
+  font-weight: bold;
+}
+
+label.field-label {
+  font-weight: bold;
+}
