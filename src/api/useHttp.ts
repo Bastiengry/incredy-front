@@ -110,7 +110,6 @@ const useHttp = (): HttpHookType => {
   const simplifyResponse = useCallback(
     async (response: Response, successCode: number) => {
       let simplyResp: SimplifiedResponse;
-      console.log('response', response);
       if (response && response.status === successCode) {
         try {
           const result = await response?.json();

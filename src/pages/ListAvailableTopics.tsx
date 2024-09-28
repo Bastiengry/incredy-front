@@ -132,7 +132,6 @@ export default function ListAvailableTopics() {
     const response: SimplifiedResponse | undefined = await httpGetSimple(
       Api.Topic.getAll(),
     );
-    console.log('response', response);
     if (response) {
       if (response.status === 'SUCCESS') {
         setTopics(response?.data);
@@ -195,7 +194,7 @@ export default function ListAvailableTopics() {
       />
     </>
   );
-  console.log('topics', topics);
+
   return (
     <>
       <h1>{t('topic.listTopics.title')}</h1>

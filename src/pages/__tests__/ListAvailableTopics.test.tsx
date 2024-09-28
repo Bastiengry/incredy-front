@@ -15,11 +15,11 @@ global.fetch = jest.fn(mockFetch) as jest.Mock;
 
 jest.mock('@react-keycloak/web', () => ({useKeycloak: () => mockUseKeycloak}));
 
-const mockDataTable = jest.fn();
+const mockDataTable = jest.fn().mockImplementation((props: any) => props);
 
 jest.mock('primereact/datatable', () => ({
   DataTable: (props: any) => {
-    mockDataTable((props: any) => props);
+    mockDataTable(props);
     return <div data-testid="datatable"></div>;
   },
 }));
@@ -68,29 +68,31 @@ describe('The available topic list', () => {
     expect(mockFetch).toHaveBeenCalled();
   });
   it('should display 2 rows when there are 2 topics', async () => {
+    const dataValue = [
+      {
+        id: 1,
+        title: 'title1',
+        text: 'text1',
+        createdDate: '2024-09-25 19:20:10',
+        lastModifiedDate: '2024-09-25 19:20:10',
+        creatorUser: 'user',
+      },
+      {
+        id: 2,
+        title: 'title2',
+        text: 'text2',
+        createdDate: '2024-09-25 19:20:11',
+        lastModifiedDate: '2024-09-25 19:20:11',
+        creatorUser: 'user',
+      },
+    ];
+
     mockFetch.mockImplementation(() =>
       Promise.resolve({
         status: 200,
         json: () =>
           Promise.resolve({
-            data: [
-              {
-                id: 1,
-                title: 'title1',
-                text: 'text1',
-                createdDate: '2024-09-25 19:20:10',
-                lastModifiedDate: '2024-09-25 19:20:10',
-                creatorUser: 'user',
-              },
-              {
-                id: 2,
-                title: 'title2',
-                text: 'text2',
-                createdDate: '2024-09-25 19:20:11',
-                lastModifiedDate: '2024-09-25 19:20:11',
-                creatorUser: 'user',
-              },
-            ],
+            data: dataValue,
             message: [],
             status: 'SUCCESS',
           }),
@@ -104,6 +106,8 @@ describe('The available topic list', () => {
     await screen.findByTestId('datatable');
 
     expect(mockFetch).toHaveBeenCalled();
-    expect(mockDataTable).toHaveBeenCalled();
+    expect(mockDataTable).toHaveBeenCalledWith(
+      expect.objectContaining({value: dataValue}),
+    );
   });
 });
