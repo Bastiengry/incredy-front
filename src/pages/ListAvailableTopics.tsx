@@ -81,6 +81,7 @@ export default function ListAvailableTopics() {
       <>
         <Button
           icon="pi pi-eye"
+          aria-label="pi-eye"
           rounded
           severity="info"
           style={{marginRight: '5px'}}
@@ -90,6 +91,7 @@ export default function ListAvailableTopics() {
           <>
             <Button
               icon="pi pi-pencil"
+              aria-label="pipencil"
               rounded
               severity="warning"
               style={{marginRight: '5px'}}
@@ -97,6 +99,7 @@ export default function ListAvailableTopics() {
             />
             <Button
               icon="pi pi-trash"
+              aria-label="pi-trash"
               rounded
               severity="danger"
               onClick={() => askConfirmationDeleteTopic(topic)}
@@ -202,6 +205,7 @@ export default function ListAvailableTopics() {
         <>
           <DataTable
             header={renderHeader}
+            data-testid="datatable"
             value={topics}
             dataKey="id"
             selectionMode="single"
@@ -218,6 +222,7 @@ export default function ListAvailableTopics() {
               body={titleBodyTemplate}
             />
             <Column
+              field="actions"
               header={t('topic.listTopics.columns.actions')}
               body={actionsBodyTemplate}
               style={{width: '200px'}}
