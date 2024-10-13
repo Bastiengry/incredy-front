@@ -1,22 +1,11 @@
 import {render, screen, within} from '@testing-library/react';
 import ListAvailableTopics from '../ListAvailableTopics';
-import {DataTable} from 'primereact/datatable';
 import {createMemoryRouter, RouterProvider} from 'react-router-dom';
 import {useKeycloak} from '@react-keycloak/web';
 
 const mockFetch = jest.fn();
 
 global.fetch = jest.fn(mockFetch) as jest.Mock;
-
-const mockDataTable = jest.fn();
-// jest.mock('primereact/datatable', () => ({
-//   DataTable: (props: any) => mockDataTable(props),
-// }));
-
-// const mockColumn = jest.fn();
-// jest.mock('primereact/column', () => ({
-//   Column: (props: any) => mockColumn(props),
-// }));
 
 jest.mock('react-i18next', () => ({
   // this mock makes sure any components using the translate hook can use it without a warning being shown
@@ -49,14 +38,11 @@ jest.mock('@react-keycloak/web', () => ({
 }));
 
 describe('The available topic list', () => {
-  // beforeEach(() => {
-  //   jest.clearAllMocks();
-  // });
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
   it('should display even with no topic available', async () => {
-    mockDataTable.mockImplementation((props: any) => {
-      return <div data-testid="datatable"></div>;
-    });
     mockFetch.mockImplementation(() =>
       Promise.resolve({
         status: 200,
@@ -77,10 +63,6 @@ describe('The available topic list', () => {
   });
 
   it('should display 2 rows when there are 2 topics', async () => {
-    // mockDataTable.mockImplementation((props: any) => {
-    //   return <div data-testid="datatable"></div>;
-    // });
-
     const dataValue = [
       {
         id: 1,
