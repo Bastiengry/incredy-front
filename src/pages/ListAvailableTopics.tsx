@@ -91,7 +91,7 @@ export default function ListAvailableTopics() {
           <>
             <Button
               icon="pi pi-pencil"
-              aria-label="pipencil"
+              aria-label="pi-pencil"
               rounded
               severity="warning"
               style={{marginRight: '5px'}}
@@ -214,6 +214,7 @@ export default function ListAvailableTopics() {
             rows={5}
             rowsPerPageOptions={[5, 10, 25, 50]}
             filters={filters}
+            aria-label="topic-datatable"
             globalFilterFields={['title']}>
             <Column
               field="title"
