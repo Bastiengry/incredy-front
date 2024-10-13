@@ -135,6 +135,7 @@ export default function ListAvailableTopics() {
     const response: SimplifiedResponse | undefined = await httpGetSimple(
       Api.Topic.getAll(),
     );
+
     if (response) {
       if (response.status === 'SUCCESS') {
         setTopics(response?.data);
@@ -187,12 +188,14 @@ export default function ListAvailableTopics() {
         label={t('topic.listTopics.deleteConfirmDialog.buttons.no')}
         icon="pi pi-times"
         outlined
+        aria-label="no-button"
         onClick={deleteModalDeleteTopicCancelled}
       />
       <Button
         label={t('topic.listTopics.deleteConfirmDialog.buttons.yes')}
         icon="pi pi-check"
         severity="danger"
+        aria-label="yes-button"
         onClick={deleteModalDeleteTopicConfirmed}
       />
     </>
@@ -233,6 +236,11 @@ export default function ListAvailableTopics() {
             visible={openModalDeleteTopic}
             header={t('topic.listTopics.deleteConfirmDialog.title')}
             modal
+            pt={{
+              root: () => ({
+                'aria-label': 'delete-dialog',
+              }),
+            }}
             footer={deleteTopicModalFooter}
             onHide={hideModalDeleteTopic}>
             <div className="confirmation-content">
