@@ -42,6 +42,7 @@ const useHttp = (): HttpHookType => {
           ...authHeader,
           ...options?.headers,
         },
+        method: 'GET',
       });
       return response;
     },
