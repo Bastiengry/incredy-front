@@ -1,26 +1,22 @@
-import {render, screen} from '@testing-library/react';
+import {render, screen, within} from '@testing-library/react';
 import ListAvailableTopics from '../ListAvailableTopics';
 import {DataTable} from 'primereact/datatable';
-import {Column, ColumnProps} from 'primereact/column';
 import {createMemoryRouter, RouterProvider} from 'react-router-dom';
+import {useKeycloak} from '@react-keycloak/web';
 
 const mockFetch = jest.fn();
-const mockUseKeycloak = jest.fn();
 
 global.fetch = jest.fn(mockFetch) as jest.Mock;
 
-jest.mock('@react-keycloak/web', () => ({useKeycloak: () => mockUseKeycloak}));
-
 const mockDataTable = jest.fn();
+// jest.mock('primereact/datatable', () => ({
+//   DataTable: (props: any) => mockDataTable(props),
+// }));
 
-jest.mock('primereact/datatable', () => ({
-  DataTable: (props: any) => mockDataTable(props),
-}));
-
-const mockColumn = jest.fn();
-jest.mock('primereact/column', () => ({
-  Column: (props: any) => mockColumn(props),
-}));
+// const mockColumn = jest.fn();
+// jest.mock('primereact/column', () => ({
+//   Column: (props: any) => mockColumn(props),
+// }));
 
 jest.mock('react-i18next', () => ({
   // this mock makes sure any components using the translate hook can use it without a warning being shown
@@ -38,18 +34,25 @@ jest.mock('react-i18next', () => ({
   },
 }));
 
-const mockedUsedNavigate = jest.fn();
+const mockUseNavigate = jest.fn().mockImplementation(() => {});
 
 jest.mock('react-router-dom', () => ({
   ...(jest.requireActual('react-router-dom') as any),
-  useNavigate: () => mockedUsedNavigate,
+  useNavigate: () => mockUseNavigate,
 }));
 
-beforeEach(() => {
-  jest.clearAllMocks();
-});
+jest.mock('@react-keycloak/web', () => ({
+  ...jest.requireActual('@react-keycloak/web'),
+  useKeycloak: jest.fn().mockImplementation(() => ({
+    keycloak: null,
+  })),
+}));
 
 describe('The available topic list', () => {
+  // beforeEach(() => {
+  //   jest.clearAllMocks();
+  // });
+
   it('should display even with no topic available', async () => {
     mockDataTable.mockImplementation((props: any) => {
       return <div data-testid="datatable"></div>;
@@ -74,9 +77,9 @@ describe('The available topic list', () => {
   });
 
   it('should display 2 rows when there are 2 topics', async () => {
-    mockDataTable.mockImplementation((props: any) => {
-      return <div data-testid="datatable"></div>;
-    });
+    // mockDataTable.mockImplementation((props: any) => {
+    //   return <div data-testid="datatable"></div>;
+    // });
 
     const dataValue = [
       {
@@ -111,29 +114,22 @@ describe('The available topic list', () => {
       {path: '*', element: <ListAvailableTopics />},
     ]);
     render(<RouterProvider router={router} />);
-    await screen.findByTestId('datatable');
+    const datatableElement = await screen.findByTestId('datatable');
+    const tableElement = within(datatableElement).getByRole('table');
+    // const tbodyElement = within(tableElement).getAllByRole(' rowgroup');  // BUG IN PRIMEREACT, SPACE IN ROLE, AND SO NOT POSSIBLE TO FILTER ON TBODY
+    // console.log('tbodyElement', tbodyElement);
+    const rowsElements = within(tableElement).getAllByRole('row');
+    expect(rowsElements.length).toEqual(3); // 1 header + 2 effective rows
+
     expect(mockFetch).toHaveBeenCalled();
-    expect(mockDataTable).toHaveBeenCalledWith(
-      expect.objectContaining({value: dataValue}),
-    );
+
+    // expect(datatable).prop('value').toBe(dataValue);
+    // expect(mockDataTable).toHaveBeenCalledWith(
+    //   expect.objectContaining({value: dataValue}),
+    // );
   });
 
-  it('should open topic page when clicking on edit', async () => {
-    mockDataTable.mockImplementation((props: any) => {
-      return <div data-testid="datatable">{props?.children}</div>;
-    });
-
-    mockColumn.mockImplementation((props: any) => {
-      // const TestColumn = jest.requireActual('primereact/column').Column;
-      // console.log('TestColumn', TestColumn);
-      const Func = props?.body;
-      return (
-        <div data-field={props?.field} data-header={props?.header}>
-          <Func />
-        </div>
-      );
-    });
-
+  it('should open topic page when clicking on edit button', async () => {
     const dataValue = [
       {
         id: 1,
@@ -152,14 +148,17 @@ describe('The available topic list', () => {
         creatorUser: 'user',
       },
     ];
+
     const keycloak = {
       tokenParsed: {
         sub: 'user',
       },
     };
-    mockUseKeycloak.mockImplementation(() => ({
+
+    useKeycloak.mockImplementation(() => ({
       keycloak,
     }));
+
     mockFetch.mockImplementation(() =>
       Promise.resolve({
         status: 200,
@@ -171,16 +170,17 @@ describe('The available topic list', () => {
           }),
       }),
     );
+
     const router = createMemoryRouter([
       {path: '*', element: <ListAvailableTopics />},
     ]);
+
     render(<RouterProvider router={router} />);
     const editButton = await screen.findAllByRole('button', {
-      name: 'pipencil',
+      name: 'pi-pencil',
     });
+    await editButton[0].click();
 
-    editButton[0].click();
-
-    expect(mockDataTable).toHaveBeenCalled();
+    expect(mockUseNavigate).toHaveBeenCalledWith('/edittopic/1');
   });
 });
