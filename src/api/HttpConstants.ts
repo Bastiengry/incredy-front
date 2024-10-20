@@ -1,4 +1,5 @@
-const APP_PREFIX = '/incredy';
+const APP_URL = process.env.REACT_APP_BACKEND_URL;
+const APP_PREFIX = process.env.REACT_APP_BACKEND_PREFIX;
 
 const HTTP_HEADER_PARAM_CONTENT_TYPE = 'content-type';
 const HTTP_HEADER_PARAM_AUTHORIZATION = 'authorization';
@@ -19,6 +20,7 @@ const defaultHeaders = {
 };
 
 const HttpConstants = {
+  APP_URL,
   APP_PREFIX,
   HTTP_HEADER_PARAM_CONTENT_TYPE,
   HTTP_HEADER_PARAM_AUTHORIZATION,

@@ -37,13 +37,16 @@ const useHttp = (): HttpHookType => {
     ) => {
       const authHeader = buildAuthorizationHeader();
 
-      const response: Response = await fetch(HttpConstants.APP_PREFIX + url, {
-        headers: {
-          ...authHeader,
-          ...options?.headers,
+      const response: Response = await fetch(
+        (HttpConstants.APP_URL || '') + (HttpConstants.APP_PREFIX || '') + url,
+        {
+          headers: {
+            ...authHeader,
+            ...options?.headers,
+          },
+          method: 'GET',
         },
-        method: 'GET',
-      });
+      );
       return response;
     },
     [buildAuthorizationHeader],
@@ -61,11 +64,14 @@ const useHttp = (): HttpHookType => {
 
       const finalBody = body ? JSON.stringify(body) : undefined;
 
-      return await fetch(HttpConstants.APP_PREFIX + url, {
-        body: finalBody,
-        headers: {...authHeader, ...options?.headers},
-        method: 'POST',
-      });
+      return await fetch(
+        (HttpConstants.APP_URL || '') + (HttpConstants.APP_PREFIX || '') + url,
+        {
+          body: finalBody,
+          headers: {...authHeader, ...options?.headers},
+          method: 'POST',
+        },
+      );
     },
     [buildAuthorizationHeader],
   );
@@ -82,11 +88,14 @@ const useHttp = (): HttpHookType => {
 
       const finalBody = body ? JSON.stringify(body) : undefined;
 
-      return await fetch(HttpConstants.APP_PREFIX + url, {
-        body: finalBody,
-        headers: {...authHeader, ...options?.headers},
-        method: 'PUT',
-      });
+      return await fetch(
+        (HttpConstants.APP_URL || '') + (HttpConstants.APP_PREFIX || '') + url,
+        {
+          body: finalBody,
+          headers: {...authHeader, ...options?.headers},
+          method: 'PUT',
+        },
+      );
     },
     [buildAuthorizationHeader],
   );
@@ -100,10 +109,13 @@ const useHttp = (): HttpHookType => {
     ) => {
       const authHeader = buildAuthorizationHeader();
 
-      fetch(HttpConstants.APP_PREFIX + url, {
-        headers: {...authHeader, ...options?.headers},
-        method: 'DELETE',
-      });
+      fetch(
+        (HttpConstants.APP_URL || '') + (HttpConstants.APP_PREFIX || '') + url,
+        {
+          headers: {...authHeader, ...options?.headers},
+          method: 'DELETE',
+        },
+      );
     },
     [buildAuthorizationHeader],
   );
