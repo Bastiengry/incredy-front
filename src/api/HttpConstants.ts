@@ -1,5 +1,5 @@
-const APP_URL = process.env.REACT_APP_BACKEND_URL;
-const APP_PREFIX = process.env.REACT_APP_BACKEND_PREFIX;
+const APP_URL = (window as any).APP_CONFIG.BACKEND_URL;
+const APP_PREFIX = (window as any).APP_CONFIG.BACKEND_PREFIX;
 
 const HTTP_HEADER_PARAM_CONTENT_TYPE = 'content-type';
 const HTTP_HEADER_PARAM_AUTHORIZATION = 'authorization';

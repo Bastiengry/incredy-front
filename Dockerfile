@@ -11,15 +11,6 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
-ARG NODE_ENV
-ARG REACT_APP_KEYCLOAK_URL
-ARG REACT_APP_BACKEND_PREFIX
-ARG REACT_APP_BACKEND_URL
-
-ENV NODE_ENV $NODE_ENV
-ENV REACT_APP_KEYCLOAK_URL $REACT_APP_KEYCLOAK_URL
-ENV REACT_APP_BACKEND_PREFIX $REACT_APP_BACKEND_PREFIX
-ENV REACT_APP_BACKEND_URL $REACT_APP_BACKEND_URL
 
 # Copy the entire application code to the container
 COPY . .
@@ -30,8 +21,13 @@ RUN npm run build
 # Use Nginx as the production server
 FROM nginx:alpine
 
+ARG APP_CONFIG_FILE_PATH
+
 # Copy the built React app to Nginx's web server directory
 COPY --from=build /app/build /usr/share/nginx/html
+
+# Replace the appConfig.js
+COPY $APP_CONFIG_FILE_PATH /usr/share/nginx/html/appConfig.js
 
 # Expose port 80 for the Nginx server
 EXPOSE 80
