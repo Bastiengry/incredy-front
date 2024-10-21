@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: incredy-front-config
+data:
+  NODE_ENV: 'production'
+  REACT_APP_KEYCLOAK_URL: 'http://172.20.0.1:9999/'
+  REACT_APP_BACKEND_PREFIX: ''
+  REACT_APP_BACKEND_URL: 'http://incredy-nodeport-service:8081'
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: incredy-front-deployment
+  labels:
+    app: incredy-front
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: incredy-front
+  template:
+    metadata:
+      labels:
+        app: incredy-front
+    spec:
+      containers:
+        - name: incredy-front
+          image: docker.io/library/incredy-front:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8081
+          envFrom:
+            - configMapRef:
+                name: incredy-front-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: incredy-front-nodeport-service
+spec:
+  selector:
+    app: incredy-front
+  ports:
+    - protocol: TCP
+      port: 8080 # This is the port in the cluster (inside Kubernetes)
+      targetPort: 80 # This is the port of the application
+      nodePort: 32080 # Port to join the application from outside (must be between 30000 and 32767)
+  type: NodePort
