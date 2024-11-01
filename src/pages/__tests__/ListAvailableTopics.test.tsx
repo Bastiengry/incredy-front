@@ -1,3 +1,4 @@
+import '../../../public/appConfig';
 import {render, screen, waitFor, within} from '@testing-library/react';
 import ListAvailableTopics from '../ListAvailableTopics';
 import {createMemoryRouter, RouterProvider} from 'react-router-dom';
@@ -247,5 +248,53 @@ describe('The available topic list', () => {
         },
       );
     });
+  });
+
+  it('should view topic page when clicking on view button', async () => {
+    const dataValue = [
+      {
+        id: 1,
+        title: 'title1',
+        text: 'text1',
+        createdDate: '2024-09-25 19:20:10',
+        lastModifiedDate: '2024-09-25 19:20:10',
+        creatorUser: 'user',
+      },
+      {
+        id: 2,
+        title: 'title2',
+        text: 'text2',
+        createdDate: '2024-09-25 19:20:11',
+        lastModifiedDate: '2024-09-25 19:20:11',
+        creatorUser: 'user',
+      },
+    ];
+
+    mockFetch.mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        json: () =>
+          Promise.resolve({
+            data: dataValue,
+            message: [],
+            status: 'SUCCESS',
+          }),
+      }),
+    );
+
+    const router = createMemoryRouter([
+      {path: '*', element: <ListAvailableTopics />},
+    ]);
+
+    render(<RouterProvider router={router} />);
+
+    // Click on view button
+    const viewButton = await screen.findAllByRole('button', {
+      name: 'pi-eye',
+    });
+    await viewButton[0].click();
+
+    // Checks the call of the navigate to go to view page.
+    expect(mockUseNavigate).toHaveBeenCalledWith('/viewtopic/1');
   });
 });

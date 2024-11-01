@@ -8,6 +8,7 @@ import {InputText} from 'primereact/inputtext';
 import {useTranslation} from 'react-i18next';
 import {useNotification} from '../notification';
 import {SimplifiedResponse} from '../api/HttpType';
+import {ProgressSpinner} from 'primereact/progressspinner';
 
 type FormData = {
   id: any;
@@ -121,49 +122,53 @@ export default function EditTopic() {
           ? t('topic.editTopic.title.add')
           : t('topic.editTopic.title.edit')}
       </h1>
-      <div className="grid">
-        <div className="field col-12">
-          <label className="col-12 field-label">
-            {t('topic.editTopic.form.titleField.label')}
-          </label>
-          <InputText
-            type="text"
-            className="col-12"
-            placeholder={t('topic.editTopic.form.titleField.placeHolder')}
-            value={formData?.title}
-            onChange={(e: any) => onChange('title', e.target.value)}
-          />
-        </div>
-        <div className="field col-12">
-          <label className="col-12 field-label">
-            {t('topic.editTopic.form.textField.label')}
-          </label>
-          <Editor
-            text={formData?.text}
-            key={formData?.id}
-            className="col-12"
-            placeholder={t('topic.editTopic.form.textField.placeHolder')}
-            onText={(value: any) => onChange('text', value)}
-          />
-        </div>
-        <div className="col-12 form-button-bar">
-          <div className="flex justify-content-end flex-wrap">
-            <Button
-              className="mr-2"
-              label={t('topic.editTopic.buttons.submit')}
-              severity="success"
-              onClick={onSave}
+      {topicId === null || topicId === undefined || formData?.id ? (
+        <div className="grid">
+          <div className="field col-12">
+            <label className="col-12 field-label">
+              {t('topic.editTopic.form.titleField.label')}
+            </label>
+            <InputText
+              type="text"
+              className="col-12"
+              placeholder={t('topic.editTopic.form.titleField.placeHolder')}
+              value={formData?.title}
+              onChange={(e: any) => onChange('title', e.target.value)}
             />
-            {topicId != null && (
+          </div>
+          <div className="field col-12">
+            <label className="col-12 field-label">
+              {t('topic.editTopic.form.textField.label')}
+            </label>
+            <Editor
+              text={formData?.text}
+              key={formData?.id}
+              className="col-12"
+              placeholder={t('topic.editTopic.form.textField.placeHolder')}
+              onText={(value: any) => onChange('text', value)}
+            />
+          </div>
+          <div className="col-12 form-button-bar">
+            <div className="flex justify-content-end flex-wrap">
               <Button
-                label={t('topic.editTopic.buttons.cancel')}
-                severity="danger"
-                onClick={onCancel}
+                className="mr-2"
+                label={t('topic.editTopic.buttons.submit')}
+                severity="success"
+                onClick={onSave}
               />
-            )}
+              {topicId != null && (
+                <Button
+                  label={t('topic.editTopic.buttons.cancel')}
+                  severity="danger"
+                  onClick={onCancel}
+                />
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <ProgressSpinner />
+      )}
     </>
   );
 }
