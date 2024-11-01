@@ -3,7 +3,10 @@ module.exports = {
   collectCoverage: true,
   collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts', '!**/vendor/**'],
   coverageDirectory: 'coverage',
-  testEnvironment: 'jsdom',
+  testEnvironment: 'jest-fixed-jsdom',
+  testEnvironmentOptions: {
+    customExportConditions: [''],
+  },
   transform: {
     '.(ts|tsx)': 'babel-jest',
   },
@@ -21,5 +24,5 @@ module.exports = {
     '\\.(css|less)$': '<rootDir>/__mocks__/styleMock.ts',
     // '\\.(gif|ttf|eot|svg)$': '<rootDir>/__mocks__/fileMock.js',
   },
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts', './jest.polyfills.ts'],
 };

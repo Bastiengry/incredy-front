@@ -5,10 +5,7 @@ services:
     build:
       context: . #PATH TO Dockerfile
       args:
-        NODE_ENV: production
-        REACT_APP_KEYCLOAK_URL: 'http://127.0.0.1:9999/'
-        REACT_APP_BACKEND_PREFIX: ''
-        REACT_APP_BACKEND_URL: 'http://172.20.0.1:8081'
+        APP_CONFIG_FILE_PATH: 'docker_resources/appConfig.js'
     image: incredy-front:latest
     ports:
       - '80:80'

@@ -1,0 +1,106 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: incredy-front-config
+data:
+  appConfig.js: |-
+    const APP_CONFIG = {
+    KEYCLOAK_URL: 'http://172.20.0.2:9999/',
+    KEYCLOAK_REALM: 'incredy',
+    KEYCLOAK_CLIENT_ID: 'incredy',
+    BACKEND_URL: '',
+    BACKEND_PREFIX: '',
+    };
+    window.APP_CONFIG = APP_CONFIG;
+  nginx.conf: |-
+    user nginx;
+    worker_processes auto;
+
+    error_log /var/log/nginx/error.log notice;
+    pid /var/run/nginx.pid;
+
+    events {
+      worker_connections 1024;
+    }
+
+    http {
+      #conf for Incredy
+      server {
+        listen 80;
+
+        location /api/ {
+          proxy_pass http://incredy-nodeport-service:8081;
+        }
+
+        location / {
+          root /usr/share/nginx/html;
+        }
+      }
+
+      include /etc/nginx/mime.types;
+      default_type application/octet-stream;
+      log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+      
+      access_log /var/log/nginx/access.log main;
+
+      sendfile on;
+
+      keepalive_timeout 65;
+
+
+      include /etc/nginx/conf.d/*.conf;
+    }
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: incredy-front-deployment
+  labels:
+    app: incredy-front
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: incredy-front
+  template:
+    metadata:
+      labels:
+        app: incredy-front
+    spec:
+      containers:
+        - name: incredy-front
+          image: docker.io/library/incredy-front:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8081
+          volumeMounts:
+            - name: config-incredy-front-volume
+              readOnly: true
+              mountPath: '/etc/nginx/nginx.conf'
+              subPath: 'nginx.conf'
+            - name: config-incredy-front-volume
+              readOnly: true
+              mountPath: '/usr/share/nginx/html/appConfig.js'
+              subPath: 'appConfig.js'
+      volumes:
+        - name: config-incredy-front-volume
+          configMap:
+            name: incredy-front-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: incredy-front-nodeport-service
+spec:
+  selector:
+    app: incredy-front
+  ports:
+    - protocol: TCP
+      port: 8080 # This is the port in the cluster (inside Kubernetes)
+      targetPort: 80 # This is the port of the application
+      nodePort: 32080 # Port to join the application from outside (must be between 30000 and 32767)
+  type: NodePort

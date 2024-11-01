@@ -8,6 +8,7 @@ type Props = {
   showHeader?: boolean;
   className?: string;
   placeholder?: string;
+  role?: string | undefined;
 };
 
 export default function Editor({
