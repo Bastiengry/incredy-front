@@ -162,7 +162,7 @@ describe('The available topic list', () => {
     const editButton = await screen.findAllByRole('button', {
       name: 'pi-pencil',
     });
-    await editButton[0].click();
+    await waitFor(async () => editButton[0].click());
 
     expect(mockUseNavigate).toHaveBeenCalledWith('/edittopic/1');
   });
@@ -219,13 +219,13 @@ describe('The available topic list', () => {
     const deleteButton = await screen.findAllByRole('button', {
       name: 'pi-trash',
     });
-    await deleteButton[0].click();
+    await waitFor(async () => deleteButton[0].click());
 
     // Validation in confirmation dialog
     const deleteDialog = await screen.findByLabelText('delete-dialog');
     const validateButton =
       await within(deleteDialog).findByLabelText('yes-button');
-    await validateButton.click();
+    await waitFor(async () => validateButton.click());
 
     // Checks the call of the delete API.
     expect(mockFetch).toHaveBeenNthCalledWith(
@@ -292,7 +292,7 @@ describe('The available topic list', () => {
     const viewButton = await screen.findAllByRole('button', {
       name: 'pi-eye',
     });
-    await viewButton[0].click();
+    await waitFor(async () => viewButton[0].click());
 
     // Checks the call of the navigate to go to view page.
     expect(mockUseNavigate).toHaveBeenCalledWith('/viewtopic/1');

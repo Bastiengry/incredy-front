@@ -2,6 +2,7 @@ import {Editor as PrimeEditor} from 'primereact/editor';
 
 type Props = {
   text?: string | null;
+  ariaLabel?: string | undefined;
   onText?: Function;
   height?: string;
   readOnly?: boolean;
@@ -13,6 +14,7 @@ type Props = {
 
 export default function Editor({
   text,
+  ariaLabel = 'editor',
   onText = () => {},
   height = '382px',
   readOnly = false,
@@ -21,7 +23,7 @@ export default function Editor({
   placeholder = undefined,
 }: Props) {
   return (
-    <div aria-label="editor" className="card">
+    <div aria-label={ariaLabel} className="card">
       <PrimeEditor
         value={text || ''}
         onTextChange={e => onText(e.htmlValue)}

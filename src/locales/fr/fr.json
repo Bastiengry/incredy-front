@@ -18,6 +18,9 @@
         "cancel": "Annuler",
         "submit": "Valider"
       },
+      "error": {
+        "loadingTopicError": "Impossible de charger le topic"
+      },
       "form": {
         "titleField": {
           "label": "Titre du topic",

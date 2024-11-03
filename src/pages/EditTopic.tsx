@@ -9,6 +9,7 @@ import {useTranslation} from 'react-i18next';
 import {useNotification} from '../notification';
 import {SimplifiedResponse} from '../api/HttpType';
 import {ProgressSpinner} from 'primereact/progressspinner';
+import {Message} from 'primereact/message';
 
 type FormData = {
   id: any;
@@ -32,6 +33,7 @@ export default function EditTopic() {
     text: '',
   });
   const {topicId} = useParams<UseParams>();
+  const [loading, setLoading] = useState<boolean>(true);
   const {httpGetSimple, httpPostSimple, httpPutSimple} = useHttp();
   const {t} = useTranslation();
   const {notifySuccess, notifyError} = useNotification();
@@ -51,20 +53,24 @@ export default function EditTopic() {
   }, []);
 
   const loadFormData = useCallback(async () => {
-    if (topicId && topicId !== 'add') {
-      const response: SimplifiedResponse | undefined = await httpGetSimple(
-        Api.Topic.get(topicId),
-      );
-      if (response) {
-        if (response.status === 'SUCCESS') {
-          setBackendData({...response?.data});
-          setFormData(_.cloneDeep(response?.data));
-        } else {
-          response.messages?.forEach((message: string) => {
-            notifyError(message);
-          });
+    try {
+      if (topicId && topicId !== 'add') {
+        const response: SimplifiedResponse | undefined = await httpGetSimple(
+          Api.Topic.get(topicId),
+        );
+        if (response) {
+          if (response.status === 'SUCCESS') {
+            setBackendData({...response?.data});
+            setFormData(_.cloneDeep(response?.data));
+          } else {
+            response.messages?.forEach((message: string) => {
+              notifyError(message);
+            });
+          }
         }
       }
+    } finally {
+      setLoading(false);
     }
   }, [httpGetSimple, notifyError, topicId]);
 
@@ -122,13 +128,17 @@ export default function EditTopic() {
           ? t('topic.editTopic.title.add')
           : t('topic.editTopic.title.edit')}
       </h1>
-      {topicId === null || topicId === undefined || formData?.id ? (
+      {loading ? (
+        <ProgressSpinner />
+      ) : formData?.id || topicId === 'add' ? (
         <div className="grid">
           <div className="field col-12">
             <label className="col-12 field-label">
               {t('topic.editTopic.form.titleField.label')}
             </label>
             <InputText
+              aria-label="title"
+              name="title"
               type="text"
               className="col-12"
               placeholder={t('topic.editTopic.form.titleField.placeHolder')}
@@ -141,6 +151,7 @@ export default function EditTopic() {
               {t('topic.editTopic.form.textField.label')}
             </label>
             <Editor
+              ariaLabel="editor"
               text={formData?.text}
               key={formData?.id}
               className="col-12"
@@ -152,6 +163,7 @@ export default function EditTopic() {
             <div className="flex justify-content-end flex-wrap">
               <Button
                 className="mr-2"
+                aria-label="submit"
                 label={t('topic.editTopic.buttons.submit')}
                 severity="success"
                 onClick={onSave}
@@ -159,6 +171,7 @@ export default function EditTopic() {
               {topicId != null && (
                 <Button
                   label={t('topic.editTopic.buttons.cancel')}
+                  aria-label="cancel"
                   severity="danger"
                   onClick={onCancel}
                 />
@@ -167,7 +180,10 @@ export default function EditTopic() {
           </div>
         </div>
       ) : (
-        <ProgressSpinner />
+        <Message
+          severity="error"
+          text={t('topic.editTopic.error.loadingTopicError')}
+        />
       )}
     </>
   );

@@ -18,6 +18,9 @@
         "cancel": "Cancel",
         "submit": "Submit"
       },
+      "error": {
+        "loadingTopicError": "Could not load topic"
+      },
       "form": {
         "titleField": {
           "label": "Title of the story",
