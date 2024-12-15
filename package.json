@@ -59,6 +59,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "jest --config jest.config.ts",
+    "test:cov": "jest --coverage",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
