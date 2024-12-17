@@ -1,4 +1,9 @@
 {
+  "global": {
+    "error": {
+      "unexpectedError": "Erreur inattendue"
+    }
+  },
   "header": {
     "menu": {
       "addTopic": {
@@ -50,6 +55,8 @@
         "message": "Etes-vous sûr de vouloir supprimer le topic \"{{topicToDelete}}\" ?",
         "title": "Confirmation"
       },
+      "errorLoading": "Erreur lors du chargement des données",
+      "nodata": "Pas de données",
       "search": "Recherche",
       "title": "Liste de tous les topics disponibles"
     }

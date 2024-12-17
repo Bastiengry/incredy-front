@@ -1,4 +1,7 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const APP_URL = (window as any).APP_CONFIG.BACKEND_URL;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const APP_PREFIX = (window as any).APP_CONFIG.BACKEND_PREFIX;
 
 const HTTP_HEADER_PARAM_CONTENT_TYPE = 'content-type';

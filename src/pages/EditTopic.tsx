@@ -7,19 +7,21 @@ import _ from 'lodash';
 import {InputText} from 'primereact/inputtext';
 import {useTranslation} from 'react-i18next';
 import {useNotification} from '../notification';
-import {SimplifiedResponse} from '../api/HttpType';
+import {NotificationMessage, SimplifiedResponse} from '../api/HttpType';
 import {ProgressSpinner} from 'primereact/progressspinner';
 import {Message} from 'primereact/message';
 
-type FormData = {
-  id: any;
+interface FormData {
+  [key: string]: string | number | undefined | null;
+  id: number | undefined;
   title: string;
   text: string;
-};
+}
 
-type UseParams = {
+interface UseParams {
+  [key: string]: string;
   topicId: string;
-};
+}
 
 export default function EditTopic() {
   const [backendData, setBackendData] = useState<FormData>({
@@ -36,8 +38,13 @@ export default function EditTopic() {
   const [loading, setLoading] = useState<boolean>(true);
   const {httpGetSimple, httpPostSimple, httpPutSimple} = useHttp();
   const {t} = useTranslation();
-  const {notifySuccess, notifyError} = useNotification();
+  const {notify} = useNotification();
   const navigate = useNavigate();
+
+  const isNumber = (value: string) => {
+    const valNumber = parseInt(value);
+    return !isNaN(valNumber) && isFinite(valNumber);
+  }
 
   const reset = useCallback(() => {
     setBackendData({
@@ -54,61 +61,64 @@ export default function EditTopic() {
 
   const loadFormData = useCallback(async () => {
     try {
-      if (topicId && topicId !== 'add') {
+      if (topicId && isNumber(topicId)) {
         const response: SimplifiedResponse | undefined = await httpGetSimple(
           Api.Topic.get(topicId),
         );
-        if (response) {
-          if (response.status === 'SUCCESS') {
-            setBackendData({...response?.data});
-            setFormData(_.cloneDeep(response?.data));
-          } else {
-            response.messages?.forEach((message: string) => {
-              notifyError(message);
-            });
-          }
+        if (response.status === 'SUCCESS') {
+          setBackendData({...response.data} as FormData);
+          setFormData(_.cloneDeep(response.data) as FormData);
+        } else {
+          response.messages?.forEach((message: NotificationMessage) => {
+            notify(message?.type, message.message);
+          });
         }
       }
+    } catch (error) {
+      notify('ERROR', error?.toString() || t('global.error.unexpectedError'));
     } finally {
       setLoading(false);
     }
-  }, [httpGetSimple, notifyError, topicId]);
+  }, [httpGetSimple, notify, topicId]);
 
-  const onChange = (param: string, value: any) => {
+  const onChange = (
+    param: string,
+    value: string | number | undefined | null,
+  ) => {
     const newFormData: FormData = _.cloneDeep(formData);
     newFormData[param as keyof FormData] = value;
     setFormData(newFormData);
   };
 
   const onSave = async () => {
-    if (topicId === 'add') {
-      const response: SimplifiedResponse | undefined = await httpPostSimple(
-        Api.Topic.create(),
-        formData,
-      );
-      if (response) {
+    try {
+      if (topicId && isNumber(topicId)) {
+        const response: SimplifiedResponse | undefined = await httpPutSimple(
+          Api.Topic.update(topicId),
+          formData,
+        );
+        if (response.status === 'SUCCESS') {
+          notify('SUCCESS', t('notification.success'));
+        } else {
+          response.messages?.forEach((message: NotificationMessage) => {
+            notify(message?.type, message.message);
+          });
+        }
+      } else if (topicId === 'add') {
+        const response: SimplifiedResponse | undefined = await httpPostSimple(
+          Api.Topic.create(),
+          formData,
+        );
         if (response.status === 'SUCCESS') {
           navigate(`/`);
         } else {
-          response.messages?.forEach((message: string) => {
-            notifyError(message);
+          response.messages?.forEach((message: NotificationMessage) => {
+            notify(message?.type, message.message);
           });
         }
-      }
-    } else if (topicId != null) {
-      const response: SimplifiedResponse | undefined = await httpPutSimple(
-        Api.Topic.update(topicId),
-        formData,
-      );
-      if (response) {
-        if (response.status === 'SUCCESS') {
-          notifySuccess(t('notification.success'));
-        } else {
-          response.messages?.forEach((message: string) => {
-            notifyError(message);
-          });
-        }
-      }
+      }       
+    } catch (error) {
+      notify('ERROR', error?.toString() || t('global.error.unexpectedError'));
     }
   };
 
@@ -143,7 +153,9 @@ export default function EditTopic() {
               className="col-12"
               placeholder={t('topic.editTopic.form.titleField.placeHolder')}
               value={formData?.title}
-              onChange={(e: any) => onChange('title', e.target.value)}
+              onChange={(e: React.FormEvent<HTMLInputElement>) =>
+                onChange('title', e.currentTarget.value)
+              }
             />
           </div>
           <div className="field col-12">
@@ -156,7 +168,7 @@ export default function EditTopic() {
               key={formData?.id}
               className="col-12"
               placeholder={t('topic.editTopic.form.textField.placeHolder')}
-              onText={(value: any) => onChange('text', value)}
+              onText={(value: string | null) => onChange('text', value)}
             />
           </div>
           <div className="col-12 form-button-bar">
@@ -181,6 +193,7 @@ export default function EditTopic() {
         </div>
       ) : (
         <Message
+          aria-label="error-message"
           severity="error"
           text={t('topic.editTopic.error.loadingTopicError')}
         />

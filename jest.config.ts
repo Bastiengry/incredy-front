@@ -10,7 +10,8 @@ module.exports = {
   transform: {
     '.(ts|tsx)': 'babel-jest',
   },
-  testPathIgnorePatterns: ['<rootDir>/node_modules/'],
+  testMatch: ['**/__tests__/**/*.js?(x)', '**/?(*.)+(spec|test).(js|ts)?(x)'],
+  testPathIgnorePatterns: ['/node_modules/', '/dist/'],
   coveragePathIgnorePatterns: [
     '/node_modules/',
     '/coverage',
