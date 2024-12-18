@@ -15,21 +15,25 @@ import {Dialog} from 'primereact/dialog';
 import {useNotification} from '../notification';
 import {useHttp} from '../api';
 import {useTranslation} from 'react-i18next';
-import {SimplifiedResponse} from '../api/HttpType';
+import {NotificationMessage, SimplifiedResponse} from '../api/HttpType';
 import {useKeycloak} from '@react-keycloak/web';
 
 export default function ListAvailableTopics() {
-  const [topics, setTopics] = useState<Topic[] | null>(null);
+  const [topics, setTopics] = useState<Topic[]>([]);
   const [topicToDelete, setTopicToDelete] = useState<Topic>();
   const [openModalDeleteTopic, setOpenModalDeleteTopic] =
     useState<boolean>(false);
   const navigate = useNavigate();
   const [filters, setFilters] = useState<DataTableFilterMeta | undefined>();
   const [globalFilterValue, setGlobalFilterValue] = useState<string>('');
-  const {notifyError} = useNotification();
+  const {notify} = useNotification();
   const {httpDelete, httpGetSimple} = useHttp();
   const {t} = useTranslation();
   const {keycloak} = useKeycloak();
+  const [emptyMessageDataTable, setEmptyMessageDataTable] = useState(
+    t('topic.listTopics.nodata'),
+  );
+  const [loading, setLoading] = useState(true);
 
   const titleBodyTemplate = (rowData: Topic) => {
     return (
@@ -45,13 +49,13 @@ export default function ListAvailableTopics() {
   };
 
   const editTopic = (topic: Topic) => {
-    if (topic?.id != null) {
+    if (topic.id) {
       navigate(`/edittopic/${topic.id}`);
     }
   };
 
-  const deleteTopic = async (topic: Topic) => {
-    if (topic?.id != null) {
+  const deleteTopic = async (topic: Topic | undefined) => {
+    if (topic?.id) {
       await httpDelete(Api.Topic.delete(topic.id));
     }
   };
@@ -71,7 +75,7 @@ export default function ListAvailableTopics() {
   };
 
   const viewTopic = (topic: Topic) => {
-    if (topic?.id != null) {
+    if (topic.id) {
       navigate(`/viewtopic/${topic.id}`);
     }
   };
@@ -117,7 +121,6 @@ export default function ListAvailableTopics() {
 
   const onGlobalFilterChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event?.target?.value;
-
     let _filters = _.cloneDeep(filters);
     if (!_filters) {
       _filters = {};
@@ -132,21 +135,33 @@ export default function ListAvailableTopics() {
   };
 
   const findAllTopics = useCallback(async () => {
-    const response: SimplifiedResponse | undefined = await httpGetSimple(
-      Api.Topic.getAll(),
-    );
+    try {
+      setEmptyMessageDataTable('');
+      setLoading(true);
+      setTopics([]);
 
-    if (response) {
-      if (response.status === 'SUCCESS') {
-        setTopics(response?.data);
-      } else {
-        setTopics(null);
-        response.messages?.forEach((message: string) => {
-          notifyError(message);
-        });
+      try {
+        const response: SimplifiedResponse = await httpGetSimple(
+          Api.Topic.getAll(),
+        );
+
+        if (response.status === 'SUCCESS') {
+          setEmptyMessageDataTable(t('topic.listTopics.nodata'));
+          setTopics(response?.data as Topic[]);
+        } else {
+          setEmptyMessageDataTable(t('topic.listTopics.errorLoading'));
+          response.messages?.forEach((message: NotificationMessage) => {
+            notify(message.type, message.message);
+          });
+        }
+      } catch (error) {
+        setEmptyMessageDataTable(t('topic.listTopics.errorLoading'));
+        notify('ERROR', error?.toString() || t('global.error.unexpectedError'));
       }
+    } finally {
+      setLoading(false);
     }
-  }, [notifyError, httpGetSimple]);
+  }, [notify, httpGetSimple, t]);
 
   useEffect(() => {
     findAllTopics();
@@ -154,8 +169,9 @@ export default function ListAvailableTopics() {
 
   const renderHeader = () => {
     return (
-      <div className="flex justify-content-between">
+      <div aria-label="filter" className="flex justify-content-between">
         <Button
+          aria-label="filter-button-clear"
           type="button"
           icon="pi pi-filter-slash"
           label={t('topic.listTopics.clear')}
@@ -165,6 +181,7 @@ export default function ListAvailableTopics() {
         <IconField iconPosition="left">
           <InputIcon className="pi pi-search" />
           <InputText
+            aria-label="filter-text"
             value={globalFilterValue}
             onChange={onGlobalFilterChange}
             placeholder={t('topic.listTopics.search')}
@@ -178,7 +195,7 @@ export default function ListAvailableTopics() {
     setOpenModalDeleteTopic(false);
     const topic = _.cloneDeep(topicToDelete);
     setTopicToDelete(undefined);
-    await deleteTopic(topic!);
+    await deleteTopic(topic);
     findAllTopics();
   };
 
@@ -204,7 +221,9 @@ export default function ListAvailableTopics() {
   return (
     <>
       <h1>{t('topic.listTopics.title')}</h1>
-      {topics != null ? (
+      {loading ? (
+        <ProgressSpinner />
+      ) : (
         <>
           <DataTable
             header={renderHeader}
@@ -217,6 +236,7 @@ export default function ListAvailableTopics() {
             rows={5}
             rowsPerPageOptions={[5, 10, 25, 50]}
             filters={filters}
+            emptyMessage={emptyMessageDataTable}
             aria-label="topic-datatable"
             globalFilterFields={['title']}>
             <Column
@@ -240,6 +260,9 @@ export default function ListAvailableTopics() {
               root: () => ({
                 'aria-label': 'delete-dialog',
               }),
+              closeButton: () => ({
+                'aria-label': 'delete-dialog-close-button',
+              }),
             }}
             footer={deleteTopicModalFooter}
             onHide={hideModalDeleteTopic}>
@@ -258,8 +281,6 @@ export default function ListAvailableTopics() {
             </div>
           </Dialog>
         </>
-      ) : (
-        <ProgressSpinner />
       )}
     </>
   );

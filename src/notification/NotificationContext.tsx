@@ -1,60 +1,44 @@
-import {createContext, useRef} from 'react';
+import {createContext, ReactNode, useCallback, useRef} from 'react';
 import {Toast} from 'primereact/toast';
 import {NotificationContextType} from './NotificationContextType';
 
 export const NotificationContext = createContext<NotificationContextType>({
-  notifySuccess: () => {},
-  notifyInfo: () => {},
-  notifyWarn: () => {},
-  notifyError: () => {},
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  notify: () => {},
 });
 
-export const NotificationProvider = ({children}: any) => {
+
+
+export const NotificationProvider = ({children}: {children: ReactNode}) => {
   const toast = useRef<Toast>(null);
 
-  const notifyMessageSuccess = (message: string) => {
-    toast?.current?.show({
-      severity: 'success',
-      summary: 'Success',
-      detail: message,
-      life: 3000,
-    });
-  };
+  const notifyMessage = useCallback((type : 'ERROR' | 'INFO' | 'SUCCESS' | undefined, message: string) => {
+    let severity: 'error' | 'success' | 'info';
+    let summary;
 
-  const notifyMessageInfo = (message: string) => {
-    toast?.current?.show({
-      severity: 'info',
-      summary: 'Info',
-      detail: message,
-      life: 3000,
-    });
-  };
+    if (type==='ERROR') {
+      severity='error';
+      summary = 'Error'; 
+    } else if (type==='SUCCESS') {
+      severity='success';
+      summary = 'Success'; 
+    } else {
+      severity='info';
+      summary = 'Info';
+    }
 
-  const notifyMessageWarn = (message: string) => {
     toast?.current?.show({
-      severity: 'warn',
-      summary: 'Warning',
+      severity,
+      summary,
       detail: message,
       life: 3000,
     });
-  };
-
-  const notifyMessageError = (message: string) => {
-    toast?.current?.show({
-      severity: 'error',
-      summary: 'Error',
-      detail: message,
-      life: 3000,
-    });
-  };
+  }, []);
 
   return (
     <NotificationContext.Provider
       value={{
-        notifySuccess: notifyMessageSuccess,
-        notifyInfo: notifyMessageInfo,
-        notifyWarn: notifyMessageWarn,
-        notifyError: notifyMessageError,
+        notify: notifyMessage,
       }}>
       <Toast ref={toast} />
       {children}

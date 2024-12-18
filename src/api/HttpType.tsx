@@ -1,38 +1,43 @@
-export type HttpOptions = {
+export interface HttpOptions {
   headers: HeadersInit | undefined;
+}
+
+export interface NotificationMessage {
+  type?: 'ERROR' | 'SUCCESS' | 'INFO';
+  message: string;
 };
 
-export type SimplifiedResponse = {
-  data?: any;
-  messages?: Array<string>;
+export interface SimplifiedResponse {
+  data?: object | undefined;
+  messages?: NotificationMessage[];
   status: string;
-};
+}
 
-export type HttpHookType = {
-  httpGet: (url: string, options?: HttpOptions | undefined) => any;
+export interface HttpHookType {
+  httpGet: (url: string, options?: HttpOptions | undefined) => object;
   httpPut: (
     url: string,
-    body?: any | undefined,
-    options?: HttpOptions | undefined,
+    body?: object | undefined,
+    options?: HttpOptions,
   ) => void;
   httpPost: (
     url: string,
-    body?: any | undefined,
-    options?: HttpOptions | undefined,
+    body?: object | undefined,
+    options?: HttpOptions,
   ) => void;
   httpDelete: (url: string, options?: HttpOptions | undefined) => void;
   httpGetSimple: (
     url: string,
     options?: HttpOptions | undefined,
-  ) => Promise<SimplifiedResponse | undefined>;
+  ) => Promise<SimplifiedResponse>;
   httpPutSimple: (
     url: string,
-    body?: any | undefined,
+    body?: object | undefined,
     options?: HttpOptions | undefined,
-  ) => Promise<SimplifiedResponse | undefined>;
+  ) => Promise<SimplifiedResponse>;
   httpPostSimple: (
     url: string,
-    body?: any | undefined,
+    body?: object | undefined,
     options?: HttpOptions | undefined,
-  ) => Promise<SimplifiedResponse | undefined>;
-};
+  ) => Promise<SimplifiedResponse>;
+}

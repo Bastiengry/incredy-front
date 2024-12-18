@@ -1,17 +1,19 @@
-import '../../../public/appConfig';
+import '../../public/appConfig';
 import {DefaultBodyType, http, HttpResponse, StrictRequest} from 'msw';
 import {setupServer} from 'msw/node';
 import {render, screen, fireEvent, waitFor} from '@testing-library/react';
-import {createMemoryRouter, RouterProvider} from 'react-router-dom';
-import EditTopic from '../EditTopic';
+import ReactRouterDom, {
+  createMemoryRouter,
+  RouterProvider,
+} from 'react-router-dom';
+import EditTopic from './EditTopic';
 import {EditorProps} from 'primereact/editor';
-import {useParams} from 'react-router-dom';
-import {Api} from '../../api';
+import {Api} from '../api';
 
 const mockEditor = jest.fn();
 jest.mock('primereact/editor', () => ({
   Editor: ({value, onTextChange}: EditorProps) => {
-    mockEditor(({value}: any) => ({value}));
+    mockEditor(({value}: {value: string | null}) => ({value}));
     return (
       <input
         type="text"
@@ -50,7 +52,7 @@ jest.mock('react-i18next', () => ({
 const mockUseNavigate = jest.fn().mockImplementation(() => {});
 
 jest.mock('react-router-dom', () => ({
-  ...(jest.requireActual('react-router-dom') as any),
+  ...jest.requireActual('react-router-dom'),
   useNavigate: () => mockUseNavigate,
   useParams: jest.fn(),
 }));
@@ -78,19 +80,20 @@ const dataValueTopic1 = {
 const server = setupServer();
 
 beforeAll(() => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   global.TextEncoder = require('util').TextEncoder;
   server.listen();
 });
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
-describe('The edit topic component', () => {
+describe('The EditTopic component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it('should display empty editor if open in add mode', async () => {
-    useParams.mockReturnValue({topicId: 'add'});
+    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({topicId: 'add'});
 
     const router = createMemoryRouter([{path: '*', element: <EditTopic />}]);
     render(<RouterProvider router={router} />);
@@ -101,7 +104,7 @@ describe('The edit topic component', () => {
   });
 
   it('should display the topic when editing one', async () => {
-    useParams.mockReturnValue({topicId: '1'});
+    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({topicId: '1'});
 
     const myGetHandler = http.get(
       APP_CONFIG.BACKEND_PREFIX + Api.Topic.update(1),
@@ -120,13 +123,13 @@ describe('The edit topic component', () => {
   });
 
   it('should be able to save changes in add mode', async () => {
-    useParams.mockReturnValue({topicId: 'add'});
+    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({topicId: 'add'});
 
     let postRequestObject: StrictRequest<DefaultBodyType>;
-    let postRequestData: any;
+    let postRequestData: object;
     const myPostHandler = http.post(
       APP_CONFIG.BACKEND_PREFIX + Api.Topic.create(),
-      async ({request, params}) => {
+      async ({request}) => {
         postRequestObject = request;
         postRequestData = await request.clone().json();
         return HttpResponse.json({});
@@ -178,7 +181,7 @@ describe('The edit topic component', () => {
   });
 
   it('should be able to save changes in edit mode', async () => {
-    useParams.mockReturnValue({topicId: '1'});
+    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({topicId: '1'});
 
     const myGetHandler = http.get(
       APP_CONFIG.BACKEND_PREFIX + Api.Topic.get(1),
@@ -189,10 +192,10 @@ describe('The edit topic component', () => {
     server.use(myGetHandler);
 
     let putRequestObject: StrictRequest<DefaultBodyType>;
-    let putRequestData: any;
+    let putRequestData: object;
     const myPutHandler = http.put(
       APP_CONFIG.BACKEND_PREFIX + Api.Topic.update(1),
-      async ({request, params}) => {
+      async ({request}) => {
         putRequestObject = request;
         putRequestData = await request.clone().json();
         return HttpResponse.json({});
@@ -242,12 +245,12 @@ describe('The edit topic component', () => {
   });
 
   it('should be able to cancel changes in add mode', async () => {
-    useParams.mockReturnValue({topicId: 'add'});
+    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({topicId: 'add'});
 
-    let postCalled: boolean = false;
+    let postCalled = false;
     const myPostHandler = http.post(
       APP_CONFIG.BACKEND_PREFIX + Api.Topic.create(),
-      async ({request, params}) => {
+      async () => {
         postCalled = true;
         return HttpResponse.json({});
       },
@@ -286,7 +289,7 @@ describe('The edit topic component', () => {
   });
 
   it('should be able to cancel changes in edit mode', async () => {
-    useParams.mockReturnValue({topicId: '1'});
+    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({topicId: '1'});
 
     const myGetHandler = http.get(
       APP_CONFIG.BACKEND_PREFIX + Api.Topic.get(1),
@@ -296,10 +299,10 @@ describe('The edit topic component', () => {
     );
     server.use(myGetHandler);
 
-    let putCalled: boolean = false;
+    let putCalled = false;
     const myPutHandler = http.put(
       APP_CONFIG.BACKEND_PREFIX + Api.Topic.update(1),
-      async ({request, params}) => {
+      async () => {
         putCalled = true;
       },
     );

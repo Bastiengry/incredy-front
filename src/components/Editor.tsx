@@ -1,22 +1,25 @@
 import {Editor as PrimeEditor} from 'primereact/editor';
 
-type Props = {
+interface Props {
   text?: string | null;
   ariaLabel?: string | undefined;
-  onText?: Function;
-  height?: string;
+  onText?: (text: string | null) => void;
+  style?: object;
   readOnly?: boolean;
   showHeader?: boolean;
   className?: string;
   placeholder?: string;
   role?: string | undefined;
-};
+}
 
 export default function Editor({
   text,
   ariaLabel = 'editor',
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   onText = () => {},
-  height = '382px',
+  style = {
+    height: '382px',
+  },
   readOnly = false,
   showHeader = true,
   className = undefined,
@@ -27,7 +30,7 @@ export default function Editor({
       <PrimeEditor
         value={text || ''}
         onTextChange={e => onText(e.htmlValue)}
-        style={{height}}
+        style={style}
         readOnly={readOnly}
         showHeader={showHeader}
         className={className}

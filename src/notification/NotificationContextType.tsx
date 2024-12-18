@@ -1,6 +1,3 @@
-export type NotificationContextType = {
-  notifySuccess: (message: string) => void;
-  notifyInfo: (message: string) => void;
-  notifyWarn: (message: string) => void;
-  notifyError: (message: string) => void;
-};
+export interface NotificationContextType {
+  notify: (type : 'ERROR' | 'INFO' | 'SUCCESS' | undefined, message: string) => void;
+}

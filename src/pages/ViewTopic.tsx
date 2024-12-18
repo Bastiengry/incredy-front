@@ -31,7 +31,7 @@ function ViewTopic() {
       <Editor
         text={topic?.text}
         key={topic?.text}
-        height="100%"
+        style={{height: '100%'}}
         readOnly
         showHeader={false}
       />

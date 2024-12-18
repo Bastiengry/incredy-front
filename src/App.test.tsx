@@ -1,7 +1,7 @@
 import {render} from '@testing-library/react';
-import App from '../App';
+import App from './App';
 
-jest.mock('../security', () => ({
+jest.mock('./security', () => ({
   keycloak: {
     init: jest.fn().mockImplementation(() => ({
       catch: jest.fn(),
@@ -9,10 +9,14 @@ jest.mock('../security', () => ({
   },
 }));
 
-jest.mock('../pages', () => ({
+jest.mock('./pages', () => ({
   HomePage: () => <div>HOME</div>,
   EditTopic: () => <div>EDIT_TOPIC</div>,
   ViewTopic: () => <div>VIEW_TOPIC</div>,
+}));
+
+jest.mock('./components', () => ({
+  Header: () => <div>HEADER</div>,
 }));
 
 describe('The application', () => {

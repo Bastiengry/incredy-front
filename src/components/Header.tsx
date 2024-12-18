@@ -32,6 +32,7 @@ export default function Header() {
 
   const start = (
     <img
+      aria-label="logo"
       alt="logo"
       src="https://primefaces.org/cdn/primereact/images/logo.png"
       height="40"
@@ -42,9 +43,9 @@ export default function Header() {
       {!!keycloak.authenticated && (
         <>
           <SplitButton
+            aria-label="btn-logout"
             label={keycloak?.tokenParsed?.preferred_username}
             icon="pi pi-user"
-            onClick={() => {}}
             className="user-button"
             model={[
               {
@@ -61,6 +62,7 @@ export default function Header() {
       )}
       {!keycloak.authenticated && (
         <button
+          aria-label="btn-login"
           className="p-link inline-flex justify-content-center align-items-center h-3rem w-3rem border-circle hover:bg-white-alpha-10 transition-all transition-duration-200"
           onClick={() => keycloak.login()}>
           <i className="pi pi-user text-1xl"></i>
@@ -70,7 +72,7 @@ export default function Header() {
   );
 
   return (
-    <div className="card">
+    <div aria-label="header" className="card">
       <Menubar model={items} start={start} end={end} />
     </div>
   );

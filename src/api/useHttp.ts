@@ -55,7 +55,7 @@ const useHttp = (): HttpHookType => {
   const httpPost = useCallback(
     async (
       url: string,
-      body: any | undefined,
+      body: object | undefined,
       options: HttpOptions | undefined = {
         headers: {...HttpConstants.defaultHeaders},
       },
@@ -79,7 +79,7 @@ const useHttp = (): HttpHookType => {
   const httpPut = useCallback(
     async (
       url: string,
-      body: any | undefined,
+      body: object | undefined,
       options: HttpOptions | undefined = {
         headers: {...HttpConstants.defaultHeaders},
       },
@@ -123,31 +123,30 @@ const useHttp = (): HttpHookType => {
   const simplifyResponse = useCallback(
     async (response: Response, successCode: number) => {
       let simplyResp: SimplifiedResponse;
-      if (response && response.status === successCode) {
-        try {
-          const result = await response?.json();
-          simplyResp = {
-            data: result.data,
-            messages: result.messages,
-            status: 'SUCCESS',
-          };
-        } catch (e) {
-          simplyResp = {
-            status: 'SUCCESS',
-          };
-        }
-      } else {
-        if (response?.statusText) {
-          simplyResp = {
-            messages: [response.statusText],
-            status: 'ERROR',
-          };
+      
+      try {
+        const result = await response.json();
+        let statusAsText ;
+        if (response.status === successCode) {
+          statusAsText='SUCCESS';
         } else {
-          simplyResp = {
-            messages: [i18next.t('global.error.unexepectedError')],
-            status: 'ERROR',
-          };
+          statusAsText='ERROR';
         }
+        simplyResp = {
+          data: result.data,
+          messages: result.messages,
+          status: statusAsText,
+        };
+      } catch (error) {
+        simplyResp = {
+          status: 'ERROR',
+          messages: [
+            {
+              type: 'ERROR',
+              message:  error?.toString() || i18next.t('global.error.unexpectedError')
+            }
+          ]
+        };
       }
 
       return simplyResp;
@@ -171,11 +170,12 @@ const useHttp = (): HttpHookType => {
   const httpPutSimple = useCallback(
     async (
       url: string,
+      body?: object | undefined,
       options: HttpOptions | undefined = {
         headers: {...HttpConstants.defaultHeaders},
       },
     ) => {
-      const response = await httpPut(url, options);
+      const response = await httpPut(url, body, options);
       return simplifyResponse(response, 200);
     },
     [httpPut, simplifyResponse],
@@ -184,11 +184,12 @@ const useHttp = (): HttpHookType => {
   const httpPostSimple = useCallback(
     async (
       url: string,
+      body?: object | undefined,
       options: HttpOptions | undefined = {
         headers: {...HttpConstants.defaultHeaders},
       },
     ) => {
-      const response = await httpPost(url, options);
+      const response = await httpPost(url, body, options);
       return simplifyResponse(response, 201);
     },
     [httpPost, simplifyResponse],
