@@ -24,7 +24,8 @@
         "submit": "Submit"
       },
       "error": {
-        "loadingTopicError": "Could not load topic"
+        "loadingTopicError": "Could not load topic: {{errorMessage}}",
+        "missingTopicIdInUrl": "Missing topic ID in the URL"
       },
       "form": {
         "titleField": {
@@ -55,10 +56,18 @@
         "message": "Are you sure you want to delete topic \"{{topicToDelete}}\" ?",
         "title": "Confirm"
       },
-      "errorLoading": "Error when loading data",
-      "nodata": "No data",
+      "error": {
+        "errorLoading": "Error when loading data",
+        "nodata": "No data"
+      },
       "search": "Search",
       "title": "List of all the available topics"
+    },
+    "viewTopic": {
+      "error": {
+        "loadingTopicError": "Could not load topic: {{errorMessage}}",
+        "missingTopicIdInUrl": "Missing topic ID in the URL"
+      }
     }
   },
   "notification": {

@@ -1,6 +1,6 @@
-import {render, screen} from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import Editor from './Editor';
-import {EditorProps, EditorTextChangeEvent} from 'primereact/editor';
+import { EditorProps, EditorTextChangeEvent } from 'primereact/editor';
 
 /**
  * Mock mandatory because PrimeReact component throws errors if used with real implementation.
@@ -9,23 +9,24 @@ const mockEditor = jest.fn();
 
 jest.mock('primereact/editor', () => ({
   Editor: (editorProps: EditorProps) => {
-    const {value, onTextChange} = editorProps;
+    const { value, onTextChange } = editorProps;
     mockEditor(editorProps);
     const event: EditorTextChangeEvent = {
       textValue: value || '',
       htmlValue: value || '',
       delta: '',
-      source: 'api',
+      source: 'user',
     };
     if (onTextChange) onTextChange(event);
     return <>{value}</>;
   },
 }));
 
+const t = (str: string) => str;
 jest.mock('react-i18next', () => ({
   useTranslation: () => {
     return {
-      t: (str: string) => str,
+      t: t,
       i18n: {
         changeLanguage: () => new Promise(() => {}),
       },

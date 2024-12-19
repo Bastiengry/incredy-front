@@ -1,7 +1,7 @@
-import {createBrowserRouter, Outlet} from 'react-router-dom';
+import { createBrowserRouter, Outlet } from 'react-router-dom';
 import PrivateRoute from './PrivateRoute';
-import {EditTopic, HomePage, ViewTopic} from '../pages';
-import {Header} from '../components';
+import { EditTopic, HomePage, ViewTopic } from '../pages';
+import { Header } from '../components';
 
 const router = createBrowserRouter([
   {

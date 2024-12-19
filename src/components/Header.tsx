@@ -1,14 +1,14 @@
-import {Menubar} from 'primereact/menubar';
-import {MenuItem} from 'primereact/menuitem';
-import {useNavigate} from 'react-router-dom';
-import {SplitButton} from 'primereact/splitbutton';
-import {useKeycloak} from '@react-keycloak/web';
-import {useTranslation} from 'react-i18next';
+import { Menubar } from 'primereact/menubar';
+import { MenuItem } from 'primereact/menuitem';
+import { useNavigate } from 'react-router-dom';
+import { SplitButton } from 'primereact/splitbutton';
+import { useKeycloak } from '@react-keycloak/web';
+import { useTranslation } from 'react-i18next';
 
 export default function Header() {
   const navigate = useNavigate();
-  const {keycloak} = useKeycloak();
-  const {t} = useTranslation();
+  const { keycloak } = useKeycloak();
+  const { t } = useTranslation();
 
   const items: MenuItem[] = [
     {
@@ -36,7 +36,9 @@ export default function Header() {
       alt="logo"
       src="https://primefaces.org/cdn/primereact/images/logo.png"
       height="40"
-      className="mr-2"></img>
+      className="mr-2"
+    >
+    </img>
   );
   const end = (
     <div className="flex align-items-center gap-2">
@@ -64,7 +66,8 @@ export default function Header() {
         <button
           aria-label="btn-login"
           className="p-link inline-flex justify-content-center align-items-center h-3rem w-3rem border-circle hover:bg-white-alpha-10 transition-all transition-duration-200"
-          onClick={() => keycloak.login()}>
+          onClick={() => keycloak.login()}
+        >
           <i className="pi pi-user text-1xl"></i>
         </button>
       )}

@@ -1,43 +1,43 @@
 import '../../public/appConfig';
-import {DefaultBodyType, http, HttpResponse, StrictRequest} from 'msw';
-import {setupServer} from 'msw/node';
-import {render, screen, fireEvent, waitFor} from '@testing-library/react';
+import { DefaultBodyType, http, HttpResponse, StrictRequest } from 'msw';
+import { setupServer } from 'msw/node';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ReactRouterDom, {
   createMemoryRouter,
   RouterProvider,
 } from 'react-router-dom';
 import EditTopic from './EditTopic';
-import {EditorProps} from 'primereact/editor';
-import {Api} from '../api';
+import { EditorProps } from 'primereact/editor';
+import { Api } from '../api';
 
 const mockEditor = jest.fn();
 jest.mock('primereact/editor', () => ({
-  Editor: ({value, onTextChange}: EditorProps) => {
-    mockEditor(({value}: {value: string | null}) => ({value}));
+  Editor: ({ value, onTextChange }: EditorProps) => {
+    mockEditor(({ value }: { value: string | null }) => ({ value }));
     return (
       <input
         type="text"
         aria-label="mock-editor"
         value={value || ''}
         onChange={e =>
-          onTextChange &&
-          onTextChange({
+          onTextChange
+          && onTextChange({
             htmlValue: e?.target.value || '',
             textValue: e?.target.value || '',
             delta: undefined,
             source: '',
-          })
-        }
+          })}
       />
     );
   },
 }));
 
+const t = (str: string) => str;
 jest.mock('react-i18next', () => ({
   // this mock makes sure any components using the translate hook can use it without a warning being shown
   useTranslation: () => {
     return {
-      t: (str: string) => str,
+      t: t,
       i18n: {
         changeLanguage: () => new Promise(() => {}),
       },
@@ -93,9 +93,9 @@ describe('The EditTopic component', () => {
   });
 
   it('should display empty editor if open in add mode', async () => {
-    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({topicId: 'add'});
+    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({ topicId: 'add' });
 
-    const router = createMemoryRouter([{path: '*', element: <EditTopic />}]);
+    const router = createMemoryRouter([{ path: '*', element: <EditTopic /> }]);
     render(<RouterProvider router={router} />);
     const titleElement = await screen.findByLabelText('title');
     expect(titleElement).toHaveValue('');
@@ -104,7 +104,7 @@ describe('The EditTopic component', () => {
   });
 
   it('should display the topic when editing one', async () => {
-    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({topicId: '1'});
+    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({ topicId: '1' });
 
     const myGetHandler = http.get(
       APP_CONFIG.BACKEND_PREFIX + Api.Topic.update(1),
@@ -114,7 +114,7 @@ describe('The EditTopic component', () => {
     );
     server.use(myGetHandler);
 
-    const router = createMemoryRouter([{path: '*', element: <EditTopic />}]);
+    const router = createMemoryRouter([{ path: '*', element: <EditTopic /> }]);
     render(<RouterProvider router={router} />);
     const titleElement = await screen.findByLabelText('title');
     expect(titleElement).toHaveValue(dataValueTopic1.data.title);
@@ -123,13 +123,13 @@ describe('The EditTopic component', () => {
   });
 
   it('should be able to save changes in add mode', async () => {
-    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({topicId: 'add'});
+    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({ topicId: 'add' });
 
     let postRequestObject: StrictRequest<DefaultBodyType>;
     let postRequestData: object;
     const myPostHandler = http.post(
       APP_CONFIG.BACKEND_PREFIX + Api.Topic.create(),
-      async ({request}) => {
+      async ({ request }) => {
         postRequestObject = request;
         postRequestData = await request.clone().json();
         return HttpResponse.json({});
@@ -137,7 +137,7 @@ describe('The EditTopic component', () => {
     );
     server.use(myPostHandler);
 
-    const router = createMemoryRouter([{path: '*', element: <EditTopic />}]);
+    const router = createMemoryRouter([{ path: '*', element: <EditTopic /> }]);
     render(<RouterProvider router={router} />);
 
     // Gets the elements
@@ -147,9 +147,9 @@ describe('The EditTopic component', () => {
     expect(editorElement).toHaveValue('');
 
     // Set data
-    fireEvent.change(titleElement, {target: {value: 'new title 1'}});
+    fireEvent.change(titleElement, { target: { value: 'new title 1' } });
     expect(titleElement).toHaveValue('new title 1');
-    fireEvent.change(editorElement, {target: {value: 'new content 1'}});
+    fireEvent.change(editorElement, { target: { value: 'new content 1' } });
     expect(editorElement).toHaveValue('new content 1');
 
     // Click on submit button
@@ -181,7 +181,7 @@ describe('The EditTopic component', () => {
   });
 
   it('should be able to save changes in edit mode', async () => {
-    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({topicId: '1'});
+    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({ topicId: '1' });
 
     const myGetHandler = http.get(
       APP_CONFIG.BACKEND_PREFIX + Api.Topic.get(1),
@@ -195,7 +195,7 @@ describe('The EditTopic component', () => {
     let putRequestData: object;
     const myPutHandler = http.put(
       APP_CONFIG.BACKEND_PREFIX + Api.Topic.update(1),
-      async ({request}) => {
+      async ({ request }) => {
         putRequestObject = request;
         putRequestData = await request.clone().json();
         return HttpResponse.json({});
@@ -203,7 +203,7 @@ describe('The EditTopic component', () => {
     );
     server.use(myPutHandler);
 
-    const router = createMemoryRouter([{path: '*', element: <EditTopic />}]);
+    const router = createMemoryRouter([{ path: '*', element: <EditTopic /> }]);
     render(<RouterProvider router={router} />);
 
     // Gets the elements
@@ -213,9 +213,9 @@ describe('The EditTopic component', () => {
     expect(editorElement).toHaveValue(dataValueTopic1.data.text);
 
     // Update data
-    fireEvent.change(titleElement, {target: {value: 'new title 1'}});
+    fireEvent.change(titleElement, { target: { value: 'new title 1' } });
     expect(titleElement).toHaveValue('new title 1');
-    fireEvent.change(editorElement, {target: {value: 'new content 1'}});
+    fireEvent.change(editorElement, { target: { value: 'new content 1' } });
     expect(editorElement).toHaveValue('new content 1');
 
     // Click on submit button
@@ -245,7 +245,7 @@ describe('The EditTopic component', () => {
   });
 
   it('should be able to cancel changes in add mode', async () => {
-    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({topicId: 'add'});
+    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({ topicId: 'add' });
 
     let postCalled = false;
     const myPostHandler = http.post(
@@ -257,7 +257,7 @@ describe('The EditTopic component', () => {
     );
     server.use(myPostHandler);
 
-    const router = createMemoryRouter([{path: '*', element: <EditTopic />}]);
+    const router = createMemoryRouter([{ path: '*', element: <EditTopic /> }]);
     render(<RouterProvider router={router} />);
 
     // Gets the elements
@@ -267,9 +267,9 @@ describe('The EditTopic component', () => {
     expect(editorElement).toHaveValue('');
 
     // Set data
-    fireEvent.change(titleElement, {target: {value: 'new title 1'}});
+    fireEvent.change(titleElement, { target: { value: 'new title 1' } });
     expect(titleElement).toHaveValue('new title 1');
-    fireEvent.change(editorElement, {target: {value: 'new content 1'}});
+    fireEvent.change(editorElement, { target: { value: 'new content 1' } });
     expect(editorElement).toHaveValue('new content 1');
 
     // Click on cancel button
@@ -289,7 +289,7 @@ describe('The EditTopic component', () => {
   });
 
   it('should be able to cancel changes in edit mode', async () => {
-    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({topicId: '1'});
+    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({ topicId: '1' });
 
     const myGetHandler = http.get(
       APP_CONFIG.BACKEND_PREFIX + Api.Topic.get(1),
@@ -308,7 +308,7 @@ describe('The EditTopic component', () => {
     );
     server.use(myPutHandler);
 
-    const router = createMemoryRouter([{path: '*', element: <EditTopic />}]);
+    const router = createMemoryRouter([{ path: '*', element: <EditTopic /> }]);
     render(<RouterProvider router={router} />);
 
     // Gets the elements
@@ -318,9 +318,9 @@ describe('The EditTopic component', () => {
     expect(editorElement).toHaveValue(dataValueTopic1.data.text);
 
     // Update data
-    fireEvent.change(titleElement, {target: {value: 'new title 1'}});
+    fireEvent.change(titleElement, { target: { value: 'new title 1' } });
     expect(titleElement).toHaveValue('new title 1');
-    fireEvent.change(editorElement, {target: {value: 'new content 1'}});
+    fireEvent.change(editorElement, { target: { value: 'new content 1' } });
     expect(editorElement).toHaveValue('new content 1');
 
     // Click on cancel button

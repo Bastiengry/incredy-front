@@ -1,15 +1,15 @@
-import {useCallback, useEffect, useState} from 'react';
-import {Button} from 'primereact/button';
+import { useCallback, useEffect, useState } from 'react';
+import { Button } from 'primereact/button';
 import Editor from '../components/Editor';
-import {Api, useHttp} from '../api';
-import {useNavigate, useParams} from 'react-router-dom';
+import { Api, useHttp } from '../api';
+import { useNavigate, useParams } from 'react-router-dom';
 import _ from 'lodash';
-import {InputText} from 'primereact/inputtext';
-import {useTranslation} from 'react-i18next';
-import {useNotification} from '../notification';
-import {NotificationMessage, SimplifiedResponse} from '../api/HttpType';
-import {ProgressSpinner} from 'primereact/progressspinner';
-import {Message} from 'primereact/message';
+import { InputText } from 'primereact/inputtext';
+import { useTranslation } from 'react-i18next';
+import { useNotification } from '../notification';
+import { NotificationMessage, SimplifiedResponse } from '../api/HttpType';
+import { ProgressSpinner } from 'primereact/progressspinner';
+import { Message } from 'primereact/message';
 
 interface FormData {
   [key: string]: string | number | undefined | null;
@@ -34,17 +34,18 @@ export default function EditTopic() {
     title: '',
     text: '',
   });
-  const {topicId} = useParams<UseParams>();
+  const { topicId } = useParams<UseParams>();
   const [loading, setLoading] = useState<boolean>(true);
-  const {httpGetSimple, httpPostSimple, httpPutSimple} = useHttp();
-  const {t} = useTranslation();
-  const {notify} = useNotification();
+  const { httpGetSimple, httpPostSimple, httpPutSimple } = useHttp();
+  const { t } = useTranslation();
+  const { notify } = useNotification();
   const navigate = useNavigate();
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   const isNumber = (value: string) => {
     const valNumber = parseInt(value);
     return !isNaN(valNumber) && isFinite(valNumber);
-  }
+  };
 
   const reset = useCallback(() => {
     setBackendData({
@@ -62,24 +63,37 @@ export default function EditTopic() {
   const loadFormData = useCallback(async () => {
     try {
       if (topicId && isNumber(topicId)) {
-        const response: SimplifiedResponse | undefined = await httpGetSimple(
+        const result: SimplifiedResponse | undefined = await httpGetSimple(
           Api.Topic.get(topicId),
         );
-        if (response.status === 'SUCCESS') {
-          setBackendData({...response.data} as FormData);
-          setFormData(_.cloneDeep(response.data) as FormData);
+        if (result.status === 'SUCCESS') {
+          setBackendData({ ...result.data } as FormData);
+          setFormData(_.cloneDeep(result.data) as FormData);
         } else {
-          response.messages?.forEach((message: NotificationMessage) => {
-            notify(message?.type, message.message);
+          let errorMessage = '';
+          result.messages?.forEach((message: NotificationMessage) => {
+            errorMessage += message.message + '\n';
+          });
+
+          setErrorMessage(t('topic.editTopic.error.loadingTopicError', { errorMessage }));
+          result.messages?.forEach((message: NotificationMessage) => {
+            notify(message.type, message.message);
           });
         }
+      } else {
+        const message: string = t('topic.editTopic.error.missingTopicIdInUrl');
+        setErrorMessage(message);
+        notify('ERROR', message);
       }
     } catch (error) {
-      notify('ERROR', error?.toString() || t('global.error.unexpectedError'));
+      setErrorMessage(t('topic.editTopic.error.loadingTopicError', {
+        errorMessage: (error?.toString() || ''),
+      }));
+      notify('ERROR', t('global.error.unexpectedError'));
     } finally {
       setLoading(false);
     }
-  }, [httpGetSimple, notify, topicId]);
+  }, [httpGetSimple, notify, t, topicId]);
 
   const onChange = (
     param: string,
@@ -116,7 +130,7 @@ export default function EditTopic() {
             notify(message?.type, message.message);
           });
         }
-      }       
+      }
     } catch (error) {
       notify('ERROR', error?.toString() || t('global.error.unexpectedError'));
     }
@@ -138,66 +152,73 @@ export default function EditTopic() {
           ? t('topic.editTopic.title.add')
           : t('topic.editTopic.title.edit')}
       </h1>
-      {loading ? (
-        <ProgressSpinner />
-      ) : formData?.id || topicId === 'add' ? (
-        <div className="grid">
-          <div className="field col-12">
-            <label className="col-12 field-label">
-              {t('topic.editTopic.form.titleField.label')}
-            </label>
-            <InputText
-              aria-label="title"
-              name="title"
-              type="text"
-              className="col-12"
-              placeholder={t('topic.editTopic.form.titleField.placeHolder')}
-              value={formData?.title}
-              onChange={(e: React.FormEvent<HTMLInputElement>) =>
-                onChange('title', e.currentTarget.value)
-              }
-            />
-          </div>
-          <div className="field col-12">
-            <label className="col-12 field-label">
-              {t('topic.editTopic.form.textField.label')}
-            </label>
-            <Editor
-              ariaLabel="editor"
-              text={formData?.text}
-              key={formData?.id}
-              className="col-12"
-              placeholder={t('topic.editTopic.form.textField.placeHolder')}
-              onText={(value: string | null) => onChange('text', value)}
-            />
-          </div>
-          <div className="col-12 form-button-bar">
-            <div className="flex justify-content-end flex-wrap">
-              <Button
-                className="mr-2"
-                aria-label="submit"
-                label={t('topic.editTopic.buttons.submit')}
-                severity="success"
-                onClick={onSave}
-              />
-              {topicId != null && (
-                <Button
-                  label={t('topic.editTopic.buttons.cancel')}
-                  aria-label="cancel"
-                  severity="danger"
-                  onClick={onCancel}
+      {
+        loading
+          ? (
+              <ProgressSpinner />
+            )
+          : formData?.id || topicId === 'add'
+            ? (
+                <div className="grid">
+                  <div className="field col-12">
+                    <label className="col-12 field-label">
+                      {t('topic.editTopic.form.titleField.label')}
+                    </label>
+                    <InputText
+                      aria-label="title"
+                      name="title"
+                      type="text"
+                      className="col-12"
+                      placeholder={t('topic.editTopic.form.titleField.placeHolder')}
+                      value={formData?.title}
+                      onChange={(e: React.FormEvent<HTMLInputElement>) =>
+                        onChange('title', e.currentTarget.value)}
+                    />
+                  </div>
+                  <div className="field col-12">
+                    <label className="col-12 field-label">
+                      {t('topic.editTopic.form.textField.label')}
+                    </label>
+                    <Editor
+                      ariaLabel="editor"
+                      text={formData?.text}
+                      key={formData?.id}
+                      className="col-12"
+                      placeholder={t('topic.editTopic.form.textField.placeHolder')}
+                      onText={(value: string | null) => onChange('text', value)}
+                    />
+                  </div>
+                  <div className="col-12 form-button-bar">
+                    <div className="flex justify-content-end flex-wrap">
+                      <Button
+                        className="mr-2"
+                        aria-label="submit"
+                        label={t('topic.editTopic.buttons.submit')}
+                        severity="success"
+                        onClick={onSave}
+                      />
+                      {
+                        topicId != null && (
+                          <Button
+                            label={t('topic.editTopic.buttons.cancel')}
+                            aria-label="cancel"
+                            severity="danger"
+                            onClick={onCancel}
+                          />
+                        )
+                      }
+                    </div>
+                  </div>
+                </div>
+              )
+            : (
+                <Message
+                  aria-label="error-message"
+                  severity="error"
+                  text={errorMessage}
                 />
-              )}
-            </div>
-          </div>
-        </div>
-      ) : (
-        <Message
-          aria-label="error-message"
-          severity="error"
-          text={t('topic.editTopic.error.loadingTopicError')}
-        />
-      )}
+              )
+      }
     </>
   );
 }

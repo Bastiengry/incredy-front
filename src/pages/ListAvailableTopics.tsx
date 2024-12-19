@@ -1,37 +1,36 @@
-import {useState, useEffect, ChangeEvent, useCallback} from 'react';
-import {DataTable, DataTableFilterMeta} from 'primereact/datatable';
-import {ProgressSpinner} from 'primereact/progressspinner';
-import {Column} from 'primereact/column';
-import {Api} from '../api';
-import {useNavigate} from 'react-router-dom';
-import {Topic} from '../types/TopicType';
-import {FilterMatchMode} from 'primereact/api';
-import {Button} from 'primereact/button';
-import {InputText} from 'primereact/inputtext';
-import {IconField} from 'primereact/iconfield';
-import {InputIcon} from 'primereact/inputicon';
+import { useState, useEffect, ChangeEvent, useCallback } from 'react';
+import { DataTable, DataTableFilterMeta } from 'primereact/datatable';
+import { ProgressSpinner } from 'primereact/progressspinner';
+import { Column } from 'primereact/column';
+import { Api } from '../api';
+import { useNavigate } from 'react-router-dom';
+import { Topic } from '../types/TopicType';
+import { FilterMatchMode } from 'primereact/api';
+import { Button } from 'primereact/button';
+import { InputText } from 'primereact/inputtext';
+import { IconField } from 'primereact/iconfield';
+import { InputIcon } from 'primereact/inputicon';
 import _ from 'lodash';
-import {Dialog} from 'primereact/dialog';
-import {useNotification} from '../notification';
-import {useHttp} from '../api';
-import {useTranslation} from 'react-i18next';
-import {NotificationMessage, SimplifiedResponse} from '../api/HttpType';
-import {useKeycloak} from '@react-keycloak/web';
+import { Dialog } from 'primereact/dialog';
+import { useNotification } from '../notification';
+import { useHttp } from '../api';
+import { useTranslation } from 'react-i18next';
+import { NotificationMessage, SimplifiedResponse } from '../api/HttpType';
+import { useKeycloak } from '@react-keycloak/web';
 
 export default function ListAvailableTopics() {
   const [topics, setTopics] = useState<Topic[]>([]);
   const [topicToDelete, setTopicToDelete] = useState<Topic>();
-  const [openModalDeleteTopic, setOpenModalDeleteTopic] =
-    useState<boolean>(false);
+  const [openModalDeleteTopic, setOpenModalDeleteTopic] = useState<boolean>(false);
   const navigate = useNavigate();
   const [filters, setFilters] = useState<DataTableFilterMeta | undefined>();
   const [globalFilterValue, setGlobalFilterValue] = useState<string>('');
-  const {notify} = useNotification();
-  const {httpDelete, httpGetSimple} = useHttp();
-  const {t} = useTranslation();
-  const {keycloak} = useKeycloak();
+  const { notify } = useNotification();
+  const { httpDelete, httpGetSimple } = useHttp();
+  const { t } = useTranslation();
+  const { keycloak } = useKeycloak();
   const [emptyMessageDataTable, setEmptyMessageDataTable] = useState(
-    t('topic.listTopics.nodata'),
+    t('topic.listTopics.error.nodata'),
   );
   const [loading, setLoading] = useState(true);
 
@@ -88,7 +87,7 @@ export default function ListAvailableTopics() {
           aria-label="pi-eye"
           rounded
           severity="info"
-          style={{marginRight: '5px'}}
+          style={{ marginRight: '5px' }}
           onClick={() => viewTopic(topic)}
         />
         {keycloak?.tokenParsed?.sub === topic?.creatorUser && (
@@ -98,7 +97,7 @@ export default function ListAvailableTopics() {
               aria-label="pi-pencil"
               rounded
               severity="warning"
-              style={{marginRight: '5px'}}
+              style={{ marginRight: '5px' }}
               onClick={() => editTopic(topic)}
             />
             <Button
@@ -146,16 +145,16 @@ export default function ListAvailableTopics() {
         );
 
         if (response.status === 'SUCCESS') {
-          setEmptyMessageDataTable(t('topic.listTopics.nodata'));
-          setTopics(response?.data as Topic[]);
+          setEmptyMessageDataTable(t('topic.listTopics.error.nodata'));
+          setTopics((response?.data || []) as Topic[]);
         } else {
-          setEmptyMessageDataTable(t('topic.listTopics.errorLoading'));
+          setEmptyMessageDataTable(t('topic.listTopics.error.errorLoading'));
           response.messages?.forEach((message: NotificationMessage) => {
             notify(message.type, message.message);
           });
         }
       } catch (error) {
-        setEmptyMessageDataTable(t('topic.listTopics.errorLoading'));
+        setEmptyMessageDataTable(t('topic.listTopics.error.errorLoading'));
         notify('ERROR', error?.toString() || t('global.error.unexpectedError'));
       }
     } finally {
@@ -221,67 +220,73 @@ export default function ListAvailableTopics() {
   return (
     <>
       <h1>{t('topic.listTopics.title')}</h1>
-      {loading ? (
-        <ProgressSpinner />
-      ) : (
-        <>
-          <DataTable
-            header={renderHeader}
-            data-testid="datatable"
-            value={topics}
-            dataKey="id"
-            selectionMode="single"
-            onSelectionChange={e => viewTopic(e.value)}
-            paginator
-            rows={5}
-            rowsPerPageOptions={[5, 10, 25, 50]}
-            filters={filters}
-            emptyMessage={emptyMessageDataTable}
-            aria-label="topic-datatable"
-            globalFilterFields={['title']}>
-            <Column
-              field="title"
-              header={t('topic.listTopics.columns.topic')}
-              sortable
-              body={titleBodyTemplate}
-            />
-            <Column
-              field="actions"
-              header={t('topic.listTopics.columns.actions')}
-              body={actionsBodyTemplate}
-              style={{width: '200px'}}
-            />
-          </DataTable>
-          <Dialog
-            visible={openModalDeleteTopic}
-            header={t('topic.listTopics.deleteConfirmDialog.title')}
-            modal
-            pt={{
-              root: () => ({
-                'aria-label': 'delete-dialog',
-              }),
-              closeButton: () => ({
-                'aria-label': 'delete-dialog-close-button',
-              }),
-            }}
-            footer={deleteTopicModalFooter}
-            onHide={hideModalDeleteTopic}>
-            <div className="confirmation-content">
-              <i
-                className="pi pi-exclamation-triangle mr-3"
-                style={{fontSize: '2rem'}}
-              />
-              {topicToDelete && (
-                <span>
-                  {t('topic.listTopics.deleteConfirmDialog.message', {
-                    topicToDelete: topicToDelete.title,
-                  })}
-                </span>
-              )}
-            </div>
-          </Dialog>
-        </>
-      )}
+      {
+        loading
+          ? (
+              <ProgressSpinner />
+            )
+          : (
+              <>
+                <DataTable
+                  header={renderHeader}
+                  data-testid="datatable"
+                  value={topics}
+                  dataKey="id"
+                  selectionMode="single"
+                  onSelectionChange={e => viewTopic(e.value)}
+                  paginator
+                  rows={5}
+                  rowsPerPageOptions={[5, 10, 25, 50]}
+                  filters={filters}
+                  emptyMessage={emptyMessageDataTable}
+                  aria-label="topic-datatable"
+                  globalFilterFields={['title']}
+                >
+                  <Column
+                    field="title"
+                    header={t('topic.listTopics.columns.topic')}
+                    sortable
+                    body={titleBodyTemplate}
+                  />
+                  <Column
+                    field="actions"
+                    header={t('topic.listTopics.columns.actions')}
+                    body={actionsBodyTemplate}
+                    style={{ width: '200px' }}
+                  />
+                </DataTable>
+                <Dialog
+                  visible={openModalDeleteTopic}
+                  header={t('topic.listTopics.deleteConfirmDialog.title')}
+                  modal
+                  pt={{
+                    root: () => ({
+                      'aria-label': 'delete-dialog',
+                    }),
+                    closeButton: () => ({
+                      'aria-label': 'delete-dialog-close-button',
+                    }),
+                  }}
+                  footer={deleteTopicModalFooter}
+                  onHide={hideModalDeleteTopic}
+                >
+                  <div className="confirmation-content">
+                    <i
+                      className="pi pi-exclamation-triangle mr-3"
+                      style={{ fontSize: '2rem' }}
+                    />
+                    {topicToDelete && (
+                      <span>
+                        {t('topic.listTopics.deleteConfirmDialog.message', {
+                          topicToDelete: topicToDelete.title,
+                        })}
+                      </span>
+                    )}
+                  </div>
+                </Dialog>
+              </>
+            )
+      }
     </>
   );
 }
