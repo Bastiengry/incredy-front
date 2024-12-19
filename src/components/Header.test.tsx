@@ -1,8 +1,8 @@
-import {render, screen, within} from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Header from './Header';
-import ReactRouterDom, {MemoryRouter} from 'react-router-dom';
-import Keycloak, {KeycloakProfile} from 'keycloak-js';
+import ReactRouterDom, { MemoryRouter } from 'react-router-dom';
+import Keycloak, { KeycloakProfile } from 'keycloak-js';
 import ReactKeycloakWeb from '@react-keycloak/web';
 
 jest.mock('@react-keycloak/web', () => ({
@@ -15,10 +15,11 @@ jest.mock('react-router-dom', () => ({
   useNavigate: jest.fn(),
 }));
 
+const t = (str: string) => str;
 jest.mock('react-i18next', () => ({
   useTranslation: () => {
     return {
-      t: (str: string) => str,
+      t: t,
       i18n: {
         changeLanguage: () => new Promise(() => {}),
       },

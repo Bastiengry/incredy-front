@@ -1,10 +1,10 @@
 import '../../public/appConfig';
-import {render, screen, waitFor, within} from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import ListAvailableTopics from './ListAvailableTopics';
-import {createMemoryRouter, RouterProvider} from 'react-router-dom';
+import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import ReactKeycloakWeb from '@react-keycloak/web';
-import {Api, HttpConstants} from '../api';
-import Keycloak, {KeycloakProfile} from 'keycloak-js';
+import { Api, HttpConstants } from '../api';
+import Keycloak, { KeycloakProfile } from 'keycloak-js';
 import userEvent from '@testing-library/user-event';
 import * as TestNotification from '../notification';
 
@@ -45,10 +45,7 @@ jest.mock('@react-keycloak/web', () => ({
 
 jest.mock('../notification', () => ({
   useNotification: jest.fn().mockReturnValue({
-    notifyError: () => {},
-    notifySuccess: () => {},
-    notifyInfo: () => {},
-    notifyWarn: () => {},
+    notify: () => {},
   }),
 }));
 
@@ -100,8 +97,8 @@ describe('The ListAvailableTopics component', () => {
   it('should display even with no topic available', async () => {
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
       if (
-        url === HttpConstants.APP_PREFIX + Api.Topic.getAll() ||
-        init?.method === 'GET'
+        url === HttpConstants.APP_PREFIX + Api.Topic.getAll()
+        || init?.method === 'GET'
       ) {
         return Promise.resolve({
           status: 200,
@@ -116,7 +113,7 @@ describe('The ListAvailableTopics component', () => {
       return null;
     });
     const router = createMemoryRouter([
-      {path: '*', element: <ListAvailableTopics />},
+      { path: '*', element: <ListAvailableTopics /> },
     ]);
     render(<RouterProvider router={router} />);
 
@@ -125,7 +122,7 @@ describe('The ListAvailableTopics component', () => {
       expect(mockFetch).toHaveBeenCalledWith(
         HttpConstants.APP_PREFIX + Api.Topic.getAll(),
         {
-          headers: {'content-type': 'application/json'},
+          headers: { 'content-type': 'application/json' },
           method: 'GET',
         },
       ),
@@ -149,7 +146,7 @@ describe('The ListAvailableTopics component', () => {
 
     // 1 data row : the one indicating that there is no data
     expect(dataRowComponents).toHaveLength(1);
-    expect(dataRowComponents[0]).toHaveTextContent('topic.listTopics.nodata');
+    expect(dataRowComponents[0]).toHaveTextContent('topic.listTopics.error.nodata');
   });
 
   it('displays 2 rows with only view button when 2 topics are returned by backend and not connected', async () => {
@@ -173,8 +170,8 @@ describe('The ListAvailableTopics component', () => {
     ];
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
       if (
-        url === HttpConstants.APP_PREFIX + Api.Topic.getAll() ||
-        init?.method === 'GET'
+        url === HttpConstants.APP_PREFIX + Api.Topic.getAll()
+        || init?.method === 'GET'
       ) {
         return Promise.resolve({
           status: 200,
@@ -187,7 +184,7 @@ describe('The ListAvailableTopics component', () => {
       }
     });
     const router = createMemoryRouter([
-      {path: '*', element: <ListAvailableTopics />},
+      { path: '*', element: <ListAvailableTopics /> },
     ]);
     render(<RouterProvider router={router} />);
 
@@ -196,7 +193,7 @@ describe('The ListAvailableTopics component', () => {
       expect(mockFetch).toHaveBeenCalledWith(
         HttpConstants.APP_PREFIX + Api.Topic.getAll(),
         {
-          headers: {'content-type': 'application/json'},
+          headers: { 'content-type': 'application/json' },
           method: 'GET',
         },
       ),
@@ -270,8 +267,8 @@ describe('The ListAvailableTopics component', () => {
     // Mocks the fetch
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
       if (
-        url === HttpConstants.APP_PREFIX + Api.Topic.getAll() ||
-        init?.method === 'GET'
+        url === HttpConstants.APP_PREFIX + Api.Topic.getAll()
+        || init?.method === 'GET'
       ) {
         return Promise.resolve({
           status: 200,
@@ -296,7 +293,7 @@ describe('The ListAvailableTopics component', () => {
     });
 
     const router = createMemoryRouter([
-      {path: '*', element: <ListAvailableTopics />},
+      { path: '*', element: <ListAvailableTopics /> },
     ]);
 
     render(<RouterProvider router={router} />);
@@ -306,7 +303,7 @@ describe('The ListAvailableTopics component', () => {
       expect(mockFetch).toHaveBeenCalledWith(
         HttpConstants.APP_PREFIX + Api.Topic.getAll(),
         {
-          headers: {'content-type': 'application/json'},
+          headers: { 'content-type': 'application/json' },
           method: 'GET',
         },
       ),
@@ -349,12 +346,67 @@ describe('The ListAvailableTopics component', () => {
     within(dataRow1Cell1Component).getByLabelText('pi-trash');
   });
 
+  it('displays "no data" when data returned by backend is null', async () => {
+    mockFetch.mockImplementation((url: string, init?: RequestInit) => {
+      if (
+        url === HttpConstants.APP_PREFIX + Api.Topic.getAll()
+        || init?.method === 'GET'
+      ) {
+        return Promise.resolve({
+          status: 200,
+          json: () =>
+            Promise.resolve({
+              data: null,
+              message: [],
+              status: 'SUCCESS',
+            }),
+        });
+      }
+      return null;
+    });
+    const router = createMemoryRouter([
+      { path: '*', element: <ListAvailableTopics /> },
+    ]);
+    render(<RouterProvider router={router} />);
+
+    // Check the call of API to get the data
+    await waitFor(() =>
+      expect(mockFetch).toHaveBeenCalledWith(
+        HttpConstants.APP_PREFIX + Api.Topic.getAll(),
+        {
+          headers: { 'content-type': 'application/json' },
+          method: 'GET',
+        },
+      ),
+    );
+
+    // Check the data table is displayed and empty.
+    // Get the table.
+    const datatableComponent = await screen.findByTestId('datatable');
+    const tableComponent = within(datatableComponent).getByRole('table');
+
+    // BUG IN PRIMEREACT, SPACE IN ROLE, AND SO NOT POSSIBLE TO FILTER ON TBODY
+    // Gets the rows  (1 row of header + X rows of data).
+    const rowComponents = within(tableComponent).getAllByRole('row');
+
+    // Row 1 : header
+    // Row 2 : data row, row indicating that there is no data
+    expect(rowComponents.length).toEqual(2);
+
+    // Gets the data rows
+    const dataRowComponents = rowComponents.slice(1);
+
+    // 1 data row : the one indicating that there is no data
+    expect(dataRowComponents).toHaveLength(1);
+    expect(dataRowComponents[0]).toHaveTextContent('topic.listTopics.error.nodata');
+  });
+
   it('shows error notification if backend returns 400', async () => {
     // Mocks the fetch
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
       if (
-        url === HttpConstants.APP_PREFIX + Api.Topic.getAll() ||
-        init?.method === 'GET'
+        url === HttpConstants.APP_PREFIX + Api.Topic.getAll()
+        || init?.method === 'GET'
       ) {
         return Promise.resolve({
           status: 400,
@@ -371,7 +423,7 @@ describe('The ListAvailableTopics component', () => {
       }
     });
     const router = createMemoryRouter([
-      {path: '*', element: <ListAvailableTopics />},
+      { path: '*', element: <ListAvailableTopics /> },
     ]);
     render(<RouterProvider router={router} />);
 
@@ -380,7 +432,7 @@ describe('The ListAvailableTopics component', () => {
       expect(mockFetch).toHaveBeenCalledWith(
         HttpConstants.APP_PREFIX + Api.Topic.getAll(),
         {
-          headers: {'content-type': 'application/json'},
+          headers: { 'content-type': 'application/json' },
           method: 'GET',
         },
       ),
@@ -392,7 +444,7 @@ describe('The ListAvailableTopics component', () => {
     // Check that the datatable contains error message (because bad answer from backend)
     const datatableComponent = await screen.findByTestId('datatable');
     expect(datatableComponent).toHaveTextContent(
-      'topic.listTopics.errorLoading',
+      'topic.listTopics.error.errorLoading',
     );
   });
 
@@ -400,8 +452,8 @@ describe('The ListAvailableTopics component', () => {
     // Mocks the fetch
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
       if (
-        url === HttpConstants.APP_PREFIX + Api.Topic.getAll() ||
-        init?.method === 'GET'
+        url === HttpConstants.APP_PREFIX + Api.Topic.getAll()
+        || init?.method === 'GET'
       ) {
         throw new Error('FETCH ERROR');
       }
@@ -409,7 +461,7 @@ describe('The ListAvailableTopics component', () => {
 
     // Renders the component
     const router = createMemoryRouter([
-      {path: '*', element: <ListAvailableTopics />},
+      { path: '*', element: <ListAvailableTopics /> },
     ]);
     render(<RouterProvider router={router} />);
 
@@ -418,7 +470,7 @@ describe('The ListAvailableTopics component', () => {
       expect(mockFetch).toHaveBeenCalledWith(
         HttpConstants.APP_PREFIX + Api.Topic.getAll(),
         {
-          headers: {'content-type': 'application/json'},
+          headers: { 'content-type': 'application/json' },
           method: 'GET',
         },
       ),
@@ -431,7 +483,7 @@ describe('The ListAvailableTopics component', () => {
     // Check that the datatable contains error message (because bad answer from backend)
     const datatableComponent = await screen.findByTestId('datatable');
     expect(datatableComponent).toHaveTextContent(
-      'topic.listTopics.errorLoading',
+      'topic.listTopics.error.errorLoading',
     );
   });
 
@@ -439,8 +491,8 @@ describe('The ListAvailableTopics component', () => {
     // Mocks the fetch
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
       if (
-        url === HttpConstants.APP_PREFIX + Api.Topic.getAll() ||
-        init?.method === 'GET'
+        url === HttpConstants.APP_PREFIX + Api.Topic.getAll()
+        || init?.method === 'GET'
       ) {
         // eslint-disable-next-line no-throw-literal
         throw null;
@@ -449,7 +501,7 @@ describe('The ListAvailableTopics component', () => {
 
     // Renders the component
     const router = createMemoryRouter([
-      {path: '*', element: <ListAvailableTopics />},
+      { path: '*', element: <ListAvailableTopics /> },
     ]);
     render(<RouterProvider router={router} />);
 
@@ -458,20 +510,19 @@ describe('The ListAvailableTopics component', () => {
       expect(mockFetch).toHaveBeenCalledWith(
         HttpConstants.APP_PREFIX + Api.Topic.getAll(),
         {
-          headers: {'content-type': 'application/json'},
+          headers: { 'content-type': 'application/json' },
           method: 'GET',
         },
       ),
     );
 
     // Check CALL of error notification
-    expect(mockNotify).toHaveBeenCalledWith('ERROR', expect.stringContaining('global.error.unexpectedError'),
-    );
+    expect(mockNotify).toHaveBeenCalledWith('ERROR', expect.stringContaining('global.error.unexpectedError'));
 
     // Check that the datatable contains error message (because bad answer from backend)
     const datatableComponent = await screen.findByTestId('datatable');
     expect(datatableComponent).toHaveTextContent(
-      'topic.listTopics.errorLoading',
+      'topic.listTopics.error.errorLoading',
     );
   });
 
@@ -521,7 +572,7 @@ describe('The ListAvailableTopics component', () => {
 
     // Renders the component
     const router = createMemoryRouter([
-      {path: '*', element: <ListAvailableTopics />},
+      { path: '*', element: <ListAvailableTopics /> },
     ]);
 
     render(<RouterProvider router={router} />);
@@ -595,7 +646,7 @@ describe('The ListAvailableTopics component', () => {
     );
 
     const router = createMemoryRouter([
-      {path: '*', element: <ListAvailableTopics />},
+      { path: '*', element: <ListAvailableTopics /> },
     ]);
 
     render(<RouterProvider router={router} />);
@@ -628,8 +679,7 @@ describe('The ListAvailableTopics component', () => {
 
     // Validation in confirmation dialog
     const deleteDialog = await screen.findByLabelText('delete-dialog');
-    const validateButton =
-      await within(deleteDialog).findByLabelText('yes-button');
+    const validateButton = await within(deleteDialog).findByLabelText('yes-button');
     await waitFor(() => validateButton.click());
 
     // Wait for the confirmation dialog to close
@@ -640,7 +690,7 @@ describe('The ListAvailableTopics component', () => {
       2,
       HttpConstants.APP_PREFIX + Api.Topic.delete(1),
       {
-        headers: {'content-type': 'application/json'},
+        headers: { 'content-type': 'application/json' },
         method: 'DELETE',
       },
     );
@@ -651,7 +701,7 @@ describe('The ListAvailableTopics component', () => {
         3,
         HttpConstants.APP_PREFIX + Api.Topic.getAll(),
         {
-          headers: {'content-type': 'application/json'},
+          headers: { 'content-type': 'application/json' },
           method: 'GET',
         },
       );
@@ -704,7 +754,7 @@ describe('The ListAvailableTopics component', () => {
 
     // Renders the component
     const router = createMemoryRouter([
-      {path: '*', element: <ListAvailableTopics />},
+      { path: '*', element: <ListAvailableTopics /> },
     ]);
 
     render(<RouterProvider router={router} />);
@@ -739,8 +789,7 @@ describe('The ListAvailableTopics component', () => {
     const deleteDialog = await screen.findByLabelText('delete-dialog');
 
     // Click on cancel button in the confirmation dialog
-    const cancelButton =
-      await within(deleteDialog).findByLabelText('no-button');
+    const cancelButton = await within(deleteDialog).findByLabelText('no-button');
     await waitFor(() => cancelButton.click());
 
     // Wait for the confirmation dialog to close
@@ -751,7 +800,7 @@ describe('The ListAvailableTopics component', () => {
       2,
       HttpConstants.APP_PREFIX + Api.Topic.delete(1),
       {
-        headers: {'content-type': 'application/json'},
+        headers: { 'content-type': 'application/json' },
         method: 'DELETE',
       },
     );
@@ -803,7 +852,7 @@ describe('The ListAvailableTopics component', () => {
 
     // Renders the component
     const router = createMemoryRouter([
-      {path: '*', element: <ListAvailableTopics />},
+      { path: '*', element: <ListAvailableTopics /> },
     ]);
 
     render(<RouterProvider router={router} />);
@@ -851,7 +900,7 @@ describe('The ListAvailableTopics component', () => {
       2,
       HttpConstants.APP_PREFIX + Api.Topic.delete(1),
       {
-        headers: {'content-type': 'application/json'},
+        headers: { 'content-type': 'application/json' },
         method: 'DELETE',
       },
     );
@@ -891,7 +940,7 @@ describe('The ListAvailableTopics component', () => {
 
     // Renders the component
     const router = createMemoryRouter([
-      {path: '*', element: <ListAvailableTopics />},
+      { path: '*', element: <ListAvailableTopics /> },
     ]);
 
     render(<RouterProvider router={router} />);
@@ -957,7 +1006,7 @@ describe('The ListAvailableTopics component', () => {
 
     // Renders the component
     const router = createMemoryRouter([
-      {path: '*', element: <ListAvailableTopics />},
+      { path: '*', element: <ListAvailableTopics /> },
     ]);
 
     render(<RouterProvider router={router} />);
@@ -1009,8 +1058,8 @@ describe('The ListAvailableTopics component', () => {
     // Mocks the fetch
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
       if (
-        url === HttpConstants.APP_PREFIX + Api.Topic.getAll() ||
-        init?.method === 'GET'
+        url === HttpConstants.APP_PREFIX + Api.Topic.getAll()
+        || init?.method === 'GET'
       ) {
         return Promise.resolve({
           status: 200,
@@ -1025,7 +1074,7 @@ describe('The ListAvailableTopics component', () => {
 
     // Renders the component
     const router = createMemoryRouter([
-      {path: '*', element: <ListAvailableTopics />},
+      { path: '*', element: <ListAvailableTopics /> },
     ]);
     render(<RouterProvider router={router} />);
 
@@ -1034,7 +1083,7 @@ describe('The ListAvailableTopics component', () => {
       expect(mockFetch).toHaveBeenCalledWith(
         HttpConstants.APP_PREFIX + Api.Topic.getAll(),
         {
-          headers: {'content-type': 'application/json'},
+          headers: { 'content-type': 'application/json' },
           method: 'GET',
         },
       ),
@@ -1074,8 +1123,7 @@ describe('The ListAvailableTopics component', () => {
     // ADD FILTER
     // Gets the filter component
     const filterComponent = within(datatableComponent).getByLabelText('filter');
-    const filterTextComponent =
-      within(filterComponent).getByLabelText('filter-text');
+    const filterTextComponent = within(filterComponent).getByLabelText('filter-text');
     userEvent.type(filterTextComponent, 'title2');
     expect(filterTextComponent).toHaveValue('title2');
 
@@ -1142,8 +1190,8 @@ describe('The ListAvailableTopics component', () => {
     ];
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
       if (
-        url === HttpConstants.APP_PREFIX + Api.Topic.getAll() ||
-        init?.method === 'GET'
+        url === HttpConstants.APP_PREFIX + Api.Topic.getAll()
+        || init?.method === 'GET'
       ) {
         return Promise.resolve({
           status: 200,
@@ -1156,7 +1204,7 @@ describe('The ListAvailableTopics component', () => {
       }
     });
     const router = createMemoryRouter([
-      {path: '*', element: <ListAvailableTopics />},
+      { path: '*', element: <ListAvailableTopics /> },
     ]);
     render(<RouterProvider router={router} />);
 
@@ -1165,7 +1213,7 @@ describe('The ListAvailableTopics component', () => {
       expect(mockFetch).toHaveBeenCalledWith(
         HttpConstants.APP_PREFIX + Api.Topic.getAll(),
         {
-          headers: {'content-type': 'application/json'},
+          headers: { 'content-type': 'application/json' },
           method: 'GET',
         },
       ),
@@ -1229,7 +1277,7 @@ describe('The ListAvailableTopics component', () => {
 
     // Renders the component
     const router = createMemoryRouter([
-      {path: '*', element: <ListAvailableTopics />},
+      { path: '*', element: <ListAvailableTopics /> },
     ]);
 
     render(<RouterProvider router={router} />);
@@ -1306,7 +1354,7 @@ describe('The ListAvailableTopics component', () => {
     );
 
     const router = createMemoryRouter([
-      {path: '*', element: <ListAvailableTopics />},
+      { path: '*', element: <ListAvailableTopics /> },
     ]);
 
     render(<RouterProvider router={router} />);
@@ -1342,8 +1390,7 @@ describe('The ListAvailableTopics component', () => {
 
     // Validation in confirmation dialog
     const deleteDialog = await screen.findByLabelText('delete-dialog');
-    const validateButton =
-      await within(deleteDialog).findByLabelText('yes-button');
+    const validateButton = await within(deleteDialog).findByLabelText('yes-button');
     await waitFor(() => validateButton.click());
 
     // Wait for the confirmation dialog to close
@@ -1391,7 +1438,7 @@ describe('The ListAvailableTopics component', () => {
 
     // Renders the component
     const router = createMemoryRouter([
-      {path: '*', element: <ListAvailableTopics />},
+      { path: '*', element: <ListAvailableTopics /> },
     ]);
 
     render(<RouterProvider router={router} />);

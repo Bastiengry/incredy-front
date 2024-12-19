@@ -1,11 +1,11 @@
-import {HttpHookType, HttpOptions, SimplifiedResponse} from './HttpType';
-import {useKeycloak} from '@react-keycloak/web';
+import { HttpHookType, HttpOptions, SimplifiedResponse } from './HttpType';
+import { useKeycloak } from '@react-keycloak/web';
 import i18next from 'i18next';
 import HttpConstants from './HttpConstants';
-import {useCallback} from 'react';
+import { useCallback } from 'react';
 
 const useHttp = (): HttpHookType => {
-  const {keycloak} = useKeycloak();
+  const { keycloak } = useKeycloak();
 
   const readAuthorizationHeaderValue = useCallback((): string | undefined => {
     let authorizationHeaderValue: string | undefined;
@@ -32,7 +32,7 @@ const useHttp = (): HttpHookType => {
     async (
       url: string,
       options: HttpOptions | undefined = {
-        headers: {...HttpConstants.defaultHeaders},
+        headers: { ...HttpConstants.defaultHeaders },
       },
     ) => {
       const authHeader = buildAuthorizationHeader();
@@ -57,7 +57,7 @@ const useHttp = (): HttpHookType => {
       url: string,
       body: object | undefined,
       options: HttpOptions | undefined = {
-        headers: {...HttpConstants.defaultHeaders},
+        headers: { ...HttpConstants.defaultHeaders },
       },
     ) => {
       const authHeader = buildAuthorizationHeader();
@@ -68,7 +68,7 @@ const useHttp = (): HttpHookType => {
         (HttpConstants.APP_URL || '') + (HttpConstants.APP_PREFIX || '') + url,
         {
           body: finalBody,
-          headers: {...authHeader, ...options?.headers},
+          headers: { ...authHeader, ...options?.headers },
           method: 'POST',
         },
       );
@@ -81,7 +81,7 @@ const useHttp = (): HttpHookType => {
       url: string,
       body: object | undefined,
       options: HttpOptions | undefined = {
-        headers: {...HttpConstants.defaultHeaders},
+        headers: { ...HttpConstants.defaultHeaders },
       },
     ) => {
       const authHeader = buildAuthorizationHeader();
@@ -92,7 +92,7 @@ const useHttp = (): HttpHookType => {
         (HttpConstants.APP_URL || '') + (HttpConstants.APP_PREFIX || '') + url,
         {
           body: finalBody,
-          headers: {...authHeader, ...options?.headers},
+          headers: { ...authHeader, ...options?.headers },
           method: 'PUT',
         },
       );
@@ -104,7 +104,7 @@ const useHttp = (): HttpHookType => {
     async (
       url: string,
       options: HttpOptions | undefined = {
-        headers: {...HttpConstants.defaultHeaders},
+        headers: { ...HttpConstants.defaultHeaders },
       },
     ) => {
       const authHeader = buildAuthorizationHeader();
@@ -112,7 +112,7 @@ const useHttp = (): HttpHookType => {
       fetch(
         (HttpConstants.APP_URL || '') + (HttpConstants.APP_PREFIX || '') + url,
         {
-          headers: {...authHeader, ...options?.headers},
+          headers: { ...authHeader, ...options?.headers },
           method: 'DELETE',
         },
       );
@@ -123,14 +123,14 @@ const useHttp = (): HttpHookType => {
   const simplifyResponse = useCallback(
     async (response: Response, successCode: number) => {
       let simplyResp: SimplifiedResponse;
-      
+
       try {
         const result = await response.json();
-        let statusAsText ;
+        let statusAsText;
         if (response.status === successCode) {
-          statusAsText='SUCCESS';
+          statusAsText = 'SUCCESS';
         } else {
-          statusAsText='ERROR';
+          statusAsText = 'ERROR';
         }
         simplyResp = {
           data: result.data,
@@ -143,9 +143,9 @@ const useHttp = (): HttpHookType => {
           messages: [
             {
               type: 'ERROR',
-              message:  error?.toString() || i18next.t('global.error.unexpectedError')
-            }
-          ]
+              message: error?.toString() || i18next.t('global.error.unexpectedError'),
+            },
+          ],
         };
       }
 
@@ -158,7 +158,7 @@ const useHttp = (): HttpHookType => {
     async (
       url: string,
       options: HttpOptions | undefined = {
-        headers: {...HttpConstants.defaultHeaders},
+        headers: { ...HttpConstants.defaultHeaders },
       },
     ) => {
       const response = await httpGet(url, options);
@@ -172,7 +172,7 @@ const useHttp = (): HttpHookType => {
       url: string,
       body?: object | undefined,
       options: HttpOptions | undefined = {
-        headers: {...HttpConstants.defaultHeaders},
+        headers: { ...HttpConstants.defaultHeaders },
       },
     ) => {
       const response = await httpPut(url, body, options);
@@ -186,7 +186,7 @@ const useHttp = (): HttpHookType => {
       url: string,
       body?: object | undefined,
       options: HttpOptions | undefined = {
-        headers: {...HttpConstants.defaultHeaders},
+        headers: { ...HttpConstants.defaultHeaders },
       },
     ) => {
       const response = await httpPost(url, body, options);

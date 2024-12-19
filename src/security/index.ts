@@ -1,3 +1,3 @@
 import keycloak from './keycloak';
 
-export {keycloak};
+export { keycloak };

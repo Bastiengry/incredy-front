@@ -24,7 +24,8 @@
         "submit": "Valider"
       },
       "error": {
-        "loadingTopicError": "Impossible de charger le topic"
+        "loadingTopicError": "Impossible de charger le topic : {{errorMessage}}",
+        "missingTopicIdInUrl": "ID du topic manquant dans l'URL"
       },
       "form": {
         "titleField": {
@@ -55,10 +56,18 @@
         "message": "Etes-vous sûr de vouloir supprimer le topic \"{{topicToDelete}}\" ?",
         "title": "Confirmation"
       },
-      "errorLoading": "Erreur lors du chargement des données",
-      "nodata": "Pas de données",
+      "error": {
+        "errorLoading": "Erreur lors du chargement des données",
+        "nodata": "Pas de données"
+      },
       "search": "Recherche",
       "title": "Liste de tous les topics disponibles"
+    },
+    "viewTopic": {
+      "error": {
+        "loadingTopicError": "Impossible de charger le topic : {{errorMessage}}",
+        "missingTopicIdInUrl": "ID du topic manquant dans l'URL"
+      }
     }
   },
   "notification": {

@@ -1,4 +1,4 @@
-import {Editor as PrimeEditor} from 'primereact/editor';
+import { Editor as PrimeEditor } from 'primereact/editor';
 
 interface Props {
   text?: string | null;
@@ -40,4 +40,4 @@ export default function Editor({
   );
 }
 
-export type {Props};
+export type { Props };
