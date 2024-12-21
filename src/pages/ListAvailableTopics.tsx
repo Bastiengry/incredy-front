@@ -4,7 +4,7 @@ import { ProgressSpinner } from 'primereact/progressspinner';
 import { Column } from 'primereact/column';
 import { Api } from '../api';
 import { useNavigate } from 'react-router-dom';
-import { Topic } from '../types/TopicType';
+import { Topic } from '../types/Topic';
 import { FilterMatchMode } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';

@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import App from './App';
 
 jest.mock('./security', () => ({
@@ -9,18 +9,23 @@ jest.mock('./security', () => ({
   },
 }));
 
-jest.mock('./pages', () => ({
-  HomePage: () => <div>HOME</div>,
-  EditTopic: () => <div>EDIT_TOPIC</div>,
-  ViewTopic: () => <div>VIEW_TOPIC</div>,
-}));
+jest.mock('./router', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const React = require('react');
 
-jest.mock('./components', () => ({
-  Header: () => <div>HEADER</div>,
-}));
+  return {
+    routesConfig: [{
+      path: '/',
+      element: React.createElement(() => <div>APP TEST</div>),
+    }],
+  };
+});
 
-describe('The application', () => {
+describe('The App component', () => {
   it('renders well', async () => {
-    render(<App />);
+    await render(<App />);
+    // Check that the text in the route is displayed
+    const internalComponent = screen.findByText('APP TEST');
+    expect(internalComponent).toBeDefined();
   });
 });

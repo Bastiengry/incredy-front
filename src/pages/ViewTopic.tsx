@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Message } from 'primereact/message';
 import { Api, useHttp } from '../api';
-import { Topic } from '../types/TopicType';
+import { Topic } from '../types/Topic';
 import { Editor } from '../components';
 import { useNotification } from '../notification';
 import { NotificationMessage } from '../api/HttpType';
