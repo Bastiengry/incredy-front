@@ -1,4 +1,4 @@
 import PrivateRoute from './PrivateRoute';
-import router from './Router';
+import routesConfig from './routesConfig';
 
-export { PrivateRoute, router };
+export { PrivateRoute, routesConfig };

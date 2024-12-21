@@ -1,9 +1,9 @@
-import { createBrowserRouter, Outlet } from 'react-router-dom';
-import PrivateRoute from './PrivateRoute';
-import { EditTopic, HomePage, ViewTopic } from '../pages';
+import { Outlet } from 'react-router-dom';
 import { Header } from '../components';
+import { EditTopic, HomePage, ViewTopic } from '../pages';
+import { PrivateRoute } from '.';
 
-const router = createBrowserRouter([
+const routesConfig = [
   {
     element: (
       <>
@@ -30,6 +30,6 @@ const router = createBrowserRouter([
       },
     ],
   },
-]);
+];
 
-export default router;
+export default routesConfig;
