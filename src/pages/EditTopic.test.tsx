@@ -87,7 +87,7 @@ describe('The EditTopic component', () => {
     jest.clearAllMocks();
   });
 
-  it('displays empty editor if open in add mode', async () => {
+  it('displays empty editor if open in ADD mode', async () => {
     // Mocks the path parameters in the URL
     jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({ topicId: 'add' });
 
@@ -107,7 +107,7 @@ describe('The EditTopic component', () => {
     expect(mockFetch).not.toHaveBeenCalled();
   });
 
-  it('displays the topic when editing one', async () => {
+  it('displays the topic in EDIT mode', async () => {
     const dataValue = {
       id: 1,
       title: 'title1',
@@ -251,11 +251,6 @@ describe('The EditTopic component', () => {
       ) {
         return Promise.resolve({
           status: 201,
-          json: () =>
-            Promise.resolve({
-              data: undefined,
-              messages: undefined,
-            }),
         });
       }
     });

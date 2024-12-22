@@ -80,7 +80,7 @@ export default function EditTopic() {
             notify(message.type, message.message);
           });
         }
-      } else {
+      } else if (topicId !== 'add') {
         const message: string = t('topic.editTopic.error.missingTopicIdInUrl');
         setErrorMessage(message);
         notify('ERROR', message);
@@ -191,6 +191,7 @@ export default function EditTopic() {
                   <div className="col-12 form-button-bar">
                     <div className="flex justify-content-end flex-wrap">
                       <Button
+                        id="btn-validate"
                         className="mr-2"
                         aria-label="submit"
                         label={t('topic.editTopic.buttons.submit')}
@@ -200,6 +201,7 @@ export default function EditTopic() {
                       {
                         topicId != null && (
                           <Button
+                            id="btn-cancel"
                             label={t('topic.editTopic.buttons.cancel')}
                             aria-label="cancel"
                             severity="danger"

@@ -229,6 +229,7 @@ export default function ListAvailableTopics() {
               <>
                 <DataTable
                   header={renderHeader}
+                  id="list-topics"
                   data-testid="datatable"
                   value={topics}
                   dataKey="id"
