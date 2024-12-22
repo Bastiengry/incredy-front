@@ -22,6 +22,7 @@ export default function Header() {
 
   if (keycloak.authenticated) {
     items.push({
+      id: 'add-topic',
       label: t('header.menu.addTopic.label'),
       icon: 'pi pi-file-plus',
       command: () => {
@@ -45,6 +46,7 @@ export default function Header() {
       {!!keycloak.authenticated && (
         <>
           <SplitButton
+            id="user-info"
             aria-label="btn-logout"
             label={keycloak?.tokenParsed?.preferred_username}
             icon="pi pi-user"
@@ -64,6 +66,7 @@ export default function Header() {
       )}
       {!keycloak.authenticated && (
         <button
+          id="btn-login"
           aria-label="btn-login"
           className="p-link inline-flex justify-content-center align-items-center h-3rem w-3rem border-circle hover:bg-white-alpha-10 transition-all transition-duration-200"
           onClick={() => keycloak.login()}

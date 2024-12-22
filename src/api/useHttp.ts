@@ -1,6 +1,5 @@
 import { HttpHookType, HttpOptions, SimplifiedResponse } from './HttpType';
 import { useKeycloak } from '@react-keycloak/web';
-import i18next from 'i18next';
 import HttpConstants from './HttpConstants';
 import { useCallback } from 'react';
 
@@ -124,28 +123,23 @@ const useHttp = (): HttpHookType => {
     async (response: Response, successCode: number) => {
       let simplyResp: SimplifiedResponse;
 
+      let statusAsText;
+      if (response.status === successCode) {
+        statusAsText = 'SUCCESS';
+      } else {
+        statusAsText = 'ERROR';
+      }
+
       try {
         const result = await response.json();
-        let statusAsText;
-        if (response.status === successCode) {
-          statusAsText = 'SUCCESS';
-        } else {
-          statusAsText = 'ERROR';
-        }
         simplyResp = {
           data: result.data,
           messages: result.messages,
           status: statusAsText,
         };
-      } catch (error) {
+      } catch {
         simplyResp = {
-          status: 'ERROR',
-          messages: [
-            {
-              type: 'ERROR',
-              message: error?.toString() || i18next.t('global.error.unexpectedError'),
-            },
-          ],
+          status: statusAsText,
         };
       }
 
