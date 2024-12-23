@@ -85,6 +85,7 @@ export default function ListAvailableTopics() {
         <Button
           icon="pi pi-eye"
           aria-label="pi-eye"
+          name="view-topic"
           rounded
           severity="info"
           style={{ marginRight: '5px' }}
@@ -95,6 +96,7 @@ export default function ListAvailableTopics() {
             <Button
               icon="pi pi-pencil"
               aria-label="pi-pencil"
+              name="edit-topic"
               rounded
               severity="warning"
               style={{ marginRight: '5px' }}
@@ -103,6 +105,7 @@ export default function ListAvailableTopics() {
             <Button
               icon="pi pi-trash"
               aria-label="pi-trash"
+              name="delete-topic"
               rounded
               severity="danger"
               onClick={() => askConfirmationDeleteTopic(topic)}
