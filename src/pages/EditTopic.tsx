@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Button } from 'primereact/button';
 import Editor from '../components/Editor';
-import { Api, useHttp } from '../api';
+import { Api } from '../api';
+import { useHttp, HttpResponseMessage, SimplifiedResponse } from '../http';
 import { useNavigate, useParams } from 'react-router-dom';
 import _ from 'lodash';
 import { InputText } from 'primereact/inputtext';
 import { useTranslation } from 'react-i18next';
 import { useNotification } from '../notification';
-import { NotificationMessage, SimplifiedResponse } from '../api/HttpType';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Message } from 'primereact/message';
 
@@ -71,12 +71,12 @@ export default function EditTopic() {
           setFormData(_.cloneDeep(result.data) as FormData);
         } else {
           let errorMessage = '';
-          result.messages?.forEach((message: NotificationMessage) => {
+          result.messages?.forEach((message: HttpResponseMessage) => {
             errorMessage += message.message + '\n';
           });
 
           setErrorMessage(t('topic.editTopic.error.loadingTopicError', { errorMessage }));
-          result.messages?.forEach((message: NotificationMessage) => {
+          result.messages?.forEach((message: HttpResponseMessage) => {
             notify(message.type, message.message);
           });
         }
@@ -114,7 +114,7 @@ export default function EditTopic() {
         if (response.status === 'SUCCESS') {
           notify('SUCCESS', t('notification.success'));
         } else {
-          response.messages?.forEach((message: NotificationMessage) => {
+          response.messages?.forEach((message: HttpResponseMessage) => {
             notify(message?.type, message.message);
           });
         }
@@ -126,7 +126,7 @@ export default function EditTopic() {
         if (response.status === 'SUCCESS') {
           navigate(`/`);
         } else {
-          response.messages?.forEach((message: NotificationMessage) => {
+          response.messages?.forEach((message: HttpResponseMessage) => {
             notify(message?.type, message.message);
           });
         }

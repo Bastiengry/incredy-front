@@ -1,10 +1,11 @@
 import '../../public/appConfig';
 import { render, screen, waitFor } from '@testing-library/react';
 import ReactRouterDom, { createMemoryRouter, RouterProvider } from 'react-router-dom';
-import { Api, HttpConstants } from '../api';
+import { Api } from '../api';
 import ViewTopic from './ViewTopic';
 import { EditorProps } from 'primereact/editor';
 import * as TestNotification from '../notification';
+import AppConfConstants from '../AppConfConstants';
 
 const mockFetch = jest.fn();
 
@@ -81,16 +82,15 @@ describe('The ViewTopic component', () => {
     // Mocks the fetch
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
       if (
-        url === HttpConstants.APP_PREFIX + Api.Topic.get(1)
-        || init?.method === 'GET'
+        url === AppConfConstants.APP_PREFIX + Api.Topic.get(1)
+        && init?.method === 'GET'
       ) {
         return Promise.resolve({
           status: 200,
           json: () =>
             Promise.resolve({
               data: dataValue,
-              message: [],
-              status: 'SUCCESS',
+              messages: [],
             }),
         });
       }
@@ -109,7 +109,7 @@ describe('The ViewTopic component', () => {
     // Checks the call of API to get the data
     await waitFor(() =>
       expect(mockFetch).toHaveBeenCalledWith(
-        HttpConstants.APP_PREFIX + Api.Topic.get(1),
+        AppConfConstants.APP_PREFIX + Api.Topic.get(1),
         {
           headers: { 'content-type': 'application/json' },
           method: 'GET',
@@ -126,8 +126,8 @@ describe('The ViewTopic component', () => {
     // Mocks the fetch
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
       if (
-        url === HttpConstants.APP_PREFIX + Api.Topic.get(1)
-        || init?.method === 'GET'
+        url === AppConfConstants.APP_PREFIX + Api.Topic.get(1)
+        && init?.method === 'GET'
       ) {
         return Promise.resolve({
           status: 400,
@@ -157,7 +157,7 @@ describe('The ViewTopic component', () => {
     // Checks the call of API to get the data
     await waitFor(() =>
       expect(mockFetch).toHaveBeenCalledWith(
-        HttpConstants.APP_PREFIX + Api.Topic.get(1),
+        AppConfConstants.APP_PREFIX + Api.Topic.get(1),
         {
           headers: { 'content-type': 'application/json' },
           method: 'GET',
@@ -178,8 +178,8 @@ describe('The ViewTopic component', () => {
     // Mocks the fetch
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
       if (
-        url === HttpConstants.APP_PREFIX + Api.Topic.get(1)
-        || init?.method === 'GET'
+        url === AppConfConstants.APP_PREFIX + Api.Topic.get(1)
+        && init?.method === 'GET'
       ) {
         throw null;
       }
@@ -198,7 +198,7 @@ describe('The ViewTopic component', () => {
     // Checks the call of API to get the data
     await waitFor(() =>
       expect(mockFetch).toHaveBeenCalledWith(
-        HttpConstants.APP_PREFIX + Api.Topic.get(1),
+        AppConfConstants.APP_PREFIX + Api.Topic.get(1),
         {
           headers: { 'content-type': 'application/json' },
           method: 'GET',

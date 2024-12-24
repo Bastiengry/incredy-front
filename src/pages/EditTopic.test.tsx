@@ -6,9 +6,10 @@ import ReactRouterDom, {
 } from 'react-router-dom';
 import EditTopic from './EditTopic';
 import { EditorProps } from 'primereact/editor';
-import { Api, HttpConstants } from '../api';
+import { Api } from '../api';
 import * as TestNotification from '../notification';
 import userEvent from '@testing-library/user-event';
+import AppConfConstants from '../AppConfConstants';
 
 const mockFetch = jest.fn();
 
@@ -120,15 +121,15 @@ describe('The EditTopic component', () => {
     // Mocks the fetch
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
       if (
-        url === HttpConstants.APP_PREFIX + Api.Topic.get(1)
-        || init?.method === 'GET'
+        url === AppConfConstants.APP_PREFIX + Api.Topic.get(1)
+        && init?.method === 'GET'
       ) {
         return Promise.resolve({
           status: 200,
           json: () =>
             Promise.resolve({
               data: dataValue,
-              message: [],
+              messages: [],
             }),
         });
       }
@@ -154,8 +155,8 @@ describe('The EditTopic component', () => {
     // Mocks the fetch
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
       if (
-        url === HttpConstants.APP_PREFIX + Api.Topic.get(1)
-        || init?.method === 'GET'
+        url === AppConfConstants.APP_PREFIX + Api.Topic.get(1)
+        && init?.method === 'GET'
       ) {
         return Promise.resolve({
           status: 400,
@@ -192,8 +193,8 @@ describe('The EditTopic component', () => {
     // Mocks the fetch
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
       if (
-        url === HttpConstants.APP_PREFIX + Api.Topic.get(1)
-        || init?.method === 'GET'
+        url === AppConfConstants.APP_PREFIX + Api.Topic.get(1)
+        && init?.method === 'GET'
       ) {
         throw new Error('FETCH ERROR');
       }
@@ -219,8 +220,8 @@ describe('The EditTopic component', () => {
     // Mocks the fetch
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
       if (
-        url === HttpConstants.APP_PREFIX + Api.Topic.get(1)
-        || init?.method === 'GET'
+        url === AppConfConstants.APP_PREFIX + Api.Topic.get(1)
+        && init?.method === 'GET'
       ) {
         throw null;
       }
@@ -246,8 +247,8 @@ describe('The EditTopic component', () => {
     // Mocks the fetch response to creation
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
       if (
-        url === HttpConstants.APP_PREFIX + Api.Topic.create()
-        || init?.method === 'POST'
+        url === AppConfConstants.APP_PREFIX + Api.Topic.create()
+        && init?.method === 'POST'
       ) {
         return Promise.resolve({
           status: 201,
@@ -285,7 +286,7 @@ describe('The EditTopic component', () => {
     // Check API call
     await waitFor(() => {
       expect(mockFetch).toHaveBeenCalledWith(
-        HttpConstants.APP_PREFIX + Api.Topic.create(),
+        AppConfConstants.APP_PREFIX + Api.Topic.create(),
         {
           method: 'POST',
           body: JSON.stringify({
@@ -305,8 +306,8 @@ describe('The EditTopic component', () => {
     // Mocks the fetch response to creation
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
       if (
-        url === HttpConstants.APP_PREFIX + Api.Topic.create()
-        || init?.method === 'POST'
+        url === AppConfConstants.APP_PREFIX + Api.Topic.create()
+        && init?.method === 'POST'
       ) {
         return Promise.resolve({
           status: 400,
@@ -353,7 +354,7 @@ describe('The EditTopic component', () => {
     // Check API call
     await waitFor(() => {
       expect(mockFetch).toHaveBeenCalledWith(
-        HttpConstants.APP_PREFIX + Api.Topic.create(),
+        AppConfConstants.APP_PREFIX + Api.Topic.create(),
         {
           method: 'POST',
           body: JSON.stringify({
@@ -373,8 +374,8 @@ describe('The EditTopic component', () => {
     // Mocks the fetch response to creation
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
       if (
-        url === HttpConstants.APP_PREFIX + Api.Topic.create()
-        || init?.method === 'POST'
+        url === AppConfConstants.APP_PREFIX + Api.Topic.create()
+        && init?.method === 'POST'
       ) {
         throw new Error('FETCH ERROR');
       }
@@ -410,7 +411,7 @@ describe('The EditTopic component', () => {
     // Check API call
     await waitFor(() => {
       expect(mockFetch).toHaveBeenCalledWith(
-        HttpConstants.APP_PREFIX + Api.Topic.create(),
+        AppConfConstants.APP_PREFIX + Api.Topic.create(),
         {
           method: 'POST',
           body: JSON.stringify({
@@ -430,8 +431,8 @@ describe('The EditTopic component', () => {
     // Mocks the fetch response to creation
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
       if (
-        url === HttpConstants.APP_PREFIX + Api.Topic.create()
-        || init?.method === 'POST'
+        url === AppConfConstants.APP_PREFIX + Api.Topic.create()
+        && init?.method === 'POST'
       ) {
         throw null;
       }
@@ -467,7 +468,7 @@ describe('The EditTopic component', () => {
     // Check API call
     await waitFor(() => {
       expect(mockFetch).toHaveBeenCalledWith(
-        HttpConstants.APP_PREFIX + Api.Topic.create(),
+        AppConfConstants.APP_PREFIX + Api.Topic.create(),
         {
           method: 'POST',
           body: JSON.stringify({
@@ -496,15 +497,15 @@ describe('The EditTopic component', () => {
     // Mocks the fetch
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
       if (
-        url === HttpConstants.APP_PREFIX + Api.Topic.get(1)
-        || init?.method === 'GET'
+        url === AppConfConstants.APP_PREFIX + Api.Topic.get(1)
+        && init?.method === 'GET'
       ) {
         return Promise.resolve({
           status: 200,
           json: () =>
             Promise.resolve({
               data: dataValue,
-              message: [],
+              messages: [],
             }),
         });
       }
@@ -545,7 +546,7 @@ describe('The EditTopic component', () => {
     // Check API call
     await waitFor(() => {
       expect(mockFetch).toHaveBeenCalledWith(
-        HttpConstants.APP_PREFIX + Api.Topic.update(1),
+        AppConfConstants.APP_PREFIX + Api.Topic.update(1),
         {
           method: 'PUT',
           body: expect.stringMatching(/"title":"new title 1".*"text":"new content 1"/),
@@ -567,17 +568,17 @@ describe('The EditTopic component', () => {
 
     // Mocks the fetch
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
-      if (url === HttpConstants.APP_PREFIX + Api.Topic.get(1)
+      if (url === AppConfConstants.APP_PREFIX + Api.Topic.get(1)
         && init?.method === 'GET') {
         return Promise.resolve({
           status: 200,
           json: () =>
             Promise.resolve({
               data: dataValue,
-              message: [],
+              messages: [],
             }),
         });
-      } else if (url === HttpConstants.APP_PREFIX + Api.Topic.get(1)
+      } else if (url === AppConfConstants.APP_PREFIX + Api.Topic.get(1)
         && init?.method === 'PUT') {
         return Promise.resolve({
           status: 400,
@@ -629,7 +630,7 @@ describe('The EditTopic component', () => {
     // Check API call
     await waitFor(() => {
       expect(mockFetch).toHaveBeenCalledWith(
-        HttpConstants.APP_PREFIX + Api.Topic.update(1),
+        AppConfConstants.APP_PREFIX + Api.Topic.update(1),
         {
           method: 'PUT',
           body: expect.stringMatching(/"title":"new title 1".*"text":"new content 1"/),
@@ -654,17 +655,17 @@ describe('The EditTopic component', () => {
 
     // Mocks the fetch
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
-      if (url === HttpConstants.APP_PREFIX + Api.Topic.get(1)
+      if (url === AppConfConstants.APP_PREFIX + Api.Topic.get(1)
         && init?.method === 'GET') {
         return Promise.resolve({
           status: 200,
           json: () =>
             Promise.resolve({
               data: dataValue,
-              message: [],
+              messages: [],
             }),
         });
-      } else if (url === HttpConstants.APP_PREFIX + Api.Topic.get(1)
+      } else if (url === AppConfConstants.APP_PREFIX + Api.Topic.get(1)
         && init?.method === 'PUT') {
         throw new Error('FETCH ERROR');
       }
@@ -705,7 +706,7 @@ describe('The EditTopic component', () => {
     // Check API call
     await waitFor(() => {
       expect(mockFetch).toHaveBeenCalledWith(
-        HttpConstants.APP_PREFIX + Api.Topic.update(1),
+        AppConfConstants.APP_PREFIX + Api.Topic.update(1),
         {
           method: 'PUT',
           body: expect.stringMatching(/"title":"new title 1".*"text":"new content 1"/),
@@ -730,17 +731,17 @@ describe('The EditTopic component', () => {
 
     // Mocks the fetch
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
-      if (url === HttpConstants.APP_PREFIX + Api.Topic.get(1)
+      if (url === AppConfConstants.APP_PREFIX + Api.Topic.get(1)
         && init?.method === 'GET') {
         return Promise.resolve({
           status: 200,
           json: () =>
             Promise.resolve({
               data: dataValue,
-              message: [],
+              messages: [],
             }),
         });
-      } else if (url === HttpConstants.APP_PREFIX + Api.Topic.get(1)
+      } else if (url === AppConfConstants.APP_PREFIX + Api.Topic.get(1)
         && init?.method === 'PUT') {
         throw null;
       }
@@ -781,7 +782,7 @@ describe('The EditTopic component', () => {
     // Check API call
     await waitFor(() => {
       expect(mockFetch).toHaveBeenCalledWith(
-        HttpConstants.APP_PREFIX + Api.Topic.update(1),
+        AppConfConstants.APP_PREFIX + Api.Topic.update(1),
         {
           method: 'PUT',
           body: expect.stringMatching(/"title":"new title 1".*"text":"new content 1"/),
@@ -806,14 +807,14 @@ describe('The EditTopic component', () => {
 
     // Mocks the fetch
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
-      if (url === HttpConstants.APP_PREFIX + Api.Topic.get(1)
+      if (url === AppConfConstants.APP_PREFIX + Api.Topic.get(1)
         && init?.method === 'GET') {
         return Promise.resolve({
           status: 200,
           json: () =>
             Promise.resolve({
               data: dataValue,
-              message: [],
+              messages: [],
             }),
         });
       }

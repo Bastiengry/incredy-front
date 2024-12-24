@@ -1,6 +1,7 @@
 import { HttpHookType, HttpOptions, SimplifiedResponse } from './HttpType';
 import { useKeycloak } from '@react-keycloak/web';
 import HttpConstants from './HttpConstants';
+import AppConfConstants from '../AppConfConstants';
 import { useCallback } from 'react';
 
 const useHttp = (): HttpHookType => {
@@ -37,7 +38,7 @@ const useHttp = (): HttpHookType => {
       const authHeader = buildAuthorizationHeader();
 
       const response: Response = await fetch(
-        (HttpConstants.APP_URL || '') + (HttpConstants.APP_PREFIX || '') + url,
+        (AppConfConstants.APP_URL || '') + (AppConfConstants.APP_PREFIX || '') + url,
         {
           headers: {
             ...authHeader,
@@ -64,7 +65,7 @@ const useHttp = (): HttpHookType => {
       const finalBody = body ? JSON.stringify(body) : undefined;
 
       return await fetch(
-        (HttpConstants.APP_URL || '') + (HttpConstants.APP_PREFIX || '') + url,
+        (AppConfConstants.APP_URL || '') + (AppConfConstants.APP_PREFIX || '') + url,
         {
           body: finalBody,
           headers: { ...authHeader, ...options?.headers },
@@ -88,7 +89,7 @@ const useHttp = (): HttpHookType => {
       const finalBody = body ? JSON.stringify(body) : undefined;
 
       return await fetch(
-        (HttpConstants.APP_URL || '') + (HttpConstants.APP_PREFIX || '') + url,
+        (AppConfConstants.APP_URL || '') + (AppConfConstants.APP_PREFIX || '') + url,
         {
           body: finalBody,
           headers: { ...authHeader, ...options?.headers },
@@ -108,8 +109,8 @@ const useHttp = (): HttpHookType => {
     ) => {
       const authHeader = buildAuthorizationHeader();
 
-      fetch(
-        (HttpConstants.APP_URL || '') + (HttpConstants.APP_PREFIX || '') + url,
+      return await fetch(
+        (AppConfConstants.APP_URL || '') + (AppConfConstants.APP_PREFIX || '') + url,
         {
           headers: { ...authHeader, ...options?.headers },
           method: 'DELETE',
