@@ -3,10 +3,11 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import ListAvailableTopics from './ListAvailableTopics';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import ReactKeycloakWeb from '@react-keycloak/web';
-import { Api, HttpConstants } from '../api';
+import { Api } from '../api';
 import Keycloak, { KeycloakProfile } from 'keycloak-js';
 import userEvent from '@testing-library/user-event';
 import * as TestNotification from '../notification';
+import AppConfConstants from '../AppConfConstants';
 
 const mockFetch = jest.fn();
 
@@ -97,16 +98,15 @@ describe('The ListAvailableTopics component', () => {
   it('should display even with no topic available', async () => {
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
       if (
-        url === HttpConstants.APP_PREFIX + Api.Topic.getAll()
-        || init?.method === 'GET'
+        url === AppConfConstants.APP_PREFIX + Api.Topic.getAll()
+        && init?.method === 'GET'
       ) {
         return Promise.resolve({
           status: 200,
           json: () =>
             Promise.resolve({
               data: [],
-              message: [],
-              status: 'SUCCESS',
+              messages: [],
             }),
         });
       }
@@ -120,7 +120,7 @@ describe('The ListAvailableTopics component', () => {
     // Check the call of API to get the data
     await waitFor(() =>
       expect(mockFetch).toHaveBeenCalledWith(
-        HttpConstants.APP_PREFIX + Api.Topic.getAll(),
+        AppConfConstants.APP_PREFIX + Api.Topic.getAll(),
         {
           headers: { 'content-type': 'application/json' },
           method: 'GET',
@@ -170,15 +170,15 @@ describe('The ListAvailableTopics component', () => {
     ];
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
       if (
-        url === HttpConstants.APP_PREFIX + Api.Topic.getAll()
-        || init?.method === 'GET'
+        url === AppConfConstants.APP_PREFIX + Api.Topic.getAll()
+        && init?.method === 'GET'
       ) {
         return Promise.resolve({
           status: 200,
           json: () =>
             Promise.resolve({
               data: dataValue,
-              message: [],
+              messages: [],
             }),
         });
       }
@@ -191,7 +191,7 @@ describe('The ListAvailableTopics component', () => {
     // Check the call of API to get the data
     await waitFor(() =>
       expect(mockFetch).toHaveBeenCalledWith(
-        HttpConstants.APP_PREFIX + Api.Topic.getAll(),
+        AppConfConstants.APP_PREFIX + Api.Topic.getAll(),
         {
           headers: { 'content-type': 'application/json' },
           method: 'GET',
@@ -267,15 +267,15 @@ describe('The ListAvailableTopics component', () => {
     // Mocks the fetch
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
       if (
-        url === HttpConstants.APP_PREFIX + Api.Topic.getAll()
-        || init?.method === 'GET'
+        url === AppConfConstants.APP_PREFIX + Api.Topic.getAll()
+        && init?.method === 'GET'
       ) {
         return Promise.resolve({
           status: 200,
           json: () =>
             Promise.resolve({
               data: dataValue,
-              message: [],
+              messages: [],
             }),
         });
       }
@@ -301,7 +301,7 @@ describe('The ListAvailableTopics component', () => {
     // Check the call of API to get the data
     await waitFor(() =>
       expect(mockFetch).toHaveBeenCalledWith(
-        HttpConstants.APP_PREFIX + Api.Topic.getAll(),
+        AppConfConstants.APP_PREFIX + Api.Topic.getAll(),
         {
           headers: { 'content-type': 'application/json' },
           method: 'GET',
@@ -349,16 +349,15 @@ describe('The ListAvailableTopics component', () => {
   it('displays "no data" when data returned by backend is null', async () => {
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
       if (
-        url === HttpConstants.APP_PREFIX + Api.Topic.getAll()
-        || init?.method === 'GET'
+        url === AppConfConstants.APP_PREFIX + Api.Topic.getAll()
+        && init?.method === 'GET'
       ) {
         return Promise.resolve({
           status: 200,
           json: () =>
             Promise.resolve({
               data: null,
-              message: [],
-              status: 'SUCCESS',
+              messages: [],
             }),
         });
       }
@@ -372,7 +371,7 @@ describe('The ListAvailableTopics component', () => {
     // Check the call of API to get the data
     await waitFor(() =>
       expect(mockFetch).toHaveBeenCalledWith(
-        HttpConstants.APP_PREFIX + Api.Topic.getAll(),
+        AppConfConstants.APP_PREFIX + Api.Topic.getAll(),
         {
           headers: { 'content-type': 'application/json' },
           method: 'GET',
@@ -405,8 +404,8 @@ describe('The ListAvailableTopics component', () => {
     // Mocks the fetch
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
       if (
-        url === HttpConstants.APP_PREFIX + Api.Topic.getAll()
-        || init?.method === 'GET'
+        url === AppConfConstants.APP_PREFIX + Api.Topic.getAll()
+        && init?.method === 'GET'
       ) {
         return Promise.resolve({
           status: 400,
@@ -430,7 +429,7 @@ describe('The ListAvailableTopics component', () => {
     // Check the call of API to get the data
     await waitFor(() =>
       expect(mockFetch).toHaveBeenCalledWith(
-        HttpConstants.APP_PREFIX + Api.Topic.getAll(),
+        AppConfConstants.APP_PREFIX + Api.Topic.getAll(),
         {
           headers: { 'content-type': 'application/json' },
           method: 'GET',
@@ -452,8 +451,8 @@ describe('The ListAvailableTopics component', () => {
     // Mocks the fetch
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
       if (
-        url === HttpConstants.APP_PREFIX + Api.Topic.getAll()
-        || init?.method === 'GET'
+        url === AppConfConstants.APP_PREFIX + Api.Topic.getAll()
+        && init?.method === 'GET'
       ) {
         throw new Error('FETCH ERROR');
       }
@@ -468,7 +467,7 @@ describe('The ListAvailableTopics component', () => {
     // Check the call of API to get the data
     await waitFor(() =>
       expect(mockFetch).toHaveBeenCalledWith(
-        HttpConstants.APP_PREFIX + Api.Topic.getAll(),
+        AppConfConstants.APP_PREFIX + Api.Topic.getAll(),
         {
           headers: { 'content-type': 'application/json' },
           method: 'GET',
@@ -491,8 +490,8 @@ describe('The ListAvailableTopics component', () => {
     // Mocks the fetch
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
       if (
-        url === HttpConstants.APP_PREFIX + Api.Topic.getAll()
-        || init?.method === 'GET'
+        url === AppConfConstants.APP_PREFIX + Api.Topic.getAll()
+        && init?.method === 'GET'
       ) {
         // eslint-disable-next-line no-throw-literal
         throw null;
@@ -508,7 +507,7 @@ describe('The ListAvailableTopics component', () => {
     // Check the call of API to get the data
     await waitFor(() =>
       expect(mockFetch).toHaveBeenCalledWith(
-        HttpConstants.APP_PREFIX + Api.Topic.getAll(),
+        AppConfConstants.APP_PREFIX + Api.Topic.getAll(),
         {
           headers: { 'content-type': 'application/json' },
           method: 'GET',
@@ -565,7 +564,7 @@ describe('The ListAvailableTopics component', () => {
         json: () =>
           Promise.resolve({
             data: dataValue,
-            message: [],
+            messages: [],
           }),
       }),
     );
@@ -640,7 +639,7 @@ describe('The ListAvailableTopics component', () => {
         json: () =>
           Promise.resolve({
             data: dataValue,
-            message: [],
+            messages: [],
           }),
       }),
     );
@@ -688,7 +687,7 @@ describe('The ListAvailableTopics component', () => {
     // Checks the call of the delete API.
     expect(mockFetch).toHaveBeenNthCalledWith(
       2,
-      HttpConstants.APP_PREFIX + Api.Topic.delete(1),
+      AppConfConstants.APP_PREFIX + Api.Topic.delete(1),
       {
         headers: { 'content-type': 'application/json' },
         method: 'DELETE',
@@ -699,7 +698,7 @@ describe('The ListAvailableTopics component', () => {
     await waitFor(() => {
       expect(mockFetch).toHaveBeenNthCalledWith(
         3,
-        HttpConstants.APP_PREFIX + Api.Topic.getAll(),
+        AppConfConstants.APP_PREFIX + Api.Topic.getAll(),
         {
           headers: { 'content-type': 'application/json' },
           method: 'GET',
@@ -747,7 +746,7 @@ describe('The ListAvailableTopics component', () => {
         json: () =>
           Promise.resolve({
             data: dataValue,
-            message: [],
+            messages: [],
           }),
       }),
     );
@@ -798,7 +797,7 @@ describe('The ListAvailableTopics component', () => {
     // Checks that the delete API is NOT called.
     expect(mockFetch).not.toHaveBeenNthCalledWith(
       2,
-      HttpConstants.APP_PREFIX + Api.Topic.delete(1),
+      AppConfConstants.APP_PREFIX + Api.Topic.delete(1),
       {
         headers: { 'content-type': 'application/json' },
         method: 'DELETE',
@@ -845,7 +844,7 @@ describe('The ListAvailableTopics component', () => {
         json: () =>
           Promise.resolve({
             data: dataValue,
-            message: [],
+            messages: [],
           }),
       }),
     );
@@ -898,7 +897,7 @@ describe('The ListAvailableTopics component', () => {
     // Checks that the delete API is NOT called.
     expect(mockFetch).not.toHaveBeenNthCalledWith(
       2,
-      HttpConstants.APP_PREFIX + Api.Topic.delete(1),
+      AppConfConstants.APP_PREFIX + Api.Topic.delete(1),
       {
         headers: { 'content-type': 'application/json' },
         method: 'DELETE',
@@ -933,7 +932,7 @@ describe('The ListAvailableTopics component', () => {
         json: () =>
           Promise.resolve({
             data: dataValue,
-            message: [],
+            messages: [],
           }),
       }),
     );
@@ -999,7 +998,7 @@ describe('The ListAvailableTopics component', () => {
         json: () =>
           Promise.resolve({
             data: dataValue,
-            message: [],
+            messages: [],
           }),
       }),
     );
@@ -1058,15 +1057,15 @@ describe('The ListAvailableTopics component', () => {
     // Mocks the fetch
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
       if (
-        url === HttpConstants.APP_PREFIX + Api.Topic.getAll()
-        || init?.method === 'GET'
+        url === AppConfConstants.APP_PREFIX + Api.Topic.getAll()
+        && init?.method === 'GET'
       ) {
         return Promise.resolve({
           status: 200,
           json: () =>
             Promise.resolve({
               data: dataValue,
-              message: [],
+              messages: [],
             }),
         });
       }
@@ -1081,7 +1080,7 @@ describe('The ListAvailableTopics component', () => {
     // Check the call of API to get the data
     await waitFor(() =>
       expect(mockFetch).toHaveBeenCalledWith(
-        HttpConstants.APP_PREFIX + Api.Topic.getAll(),
+        AppConfConstants.APP_PREFIX + Api.Topic.getAll(),
         {
           headers: { 'content-type': 'application/json' },
           method: 'GET',
@@ -1190,15 +1189,15 @@ describe('The ListAvailableTopics component', () => {
     ];
     mockFetch.mockImplementation((url: string, init?: RequestInit) => {
       if (
-        url === HttpConstants.APP_PREFIX + Api.Topic.getAll()
-        || init?.method === 'GET'
+        url === AppConfConstants.APP_PREFIX + Api.Topic.getAll()
+        && init?.method === 'GET'
       ) {
         return Promise.resolve({
           status: 200,
           json: () =>
             Promise.resolve({
               data: dataValue,
-              message: [],
+              messages: [],
             }),
         });
       }
@@ -1211,7 +1210,7 @@ describe('The ListAvailableTopics component', () => {
     // Check the call of API to get the data
     await waitFor(() =>
       expect(mockFetch).toHaveBeenCalledWith(
-        HttpConstants.APP_PREFIX + Api.Topic.getAll(),
+        AppConfConstants.APP_PREFIX + Api.Topic.getAll(),
         {
           headers: { 'content-type': 'application/json' },
           method: 'GET',
@@ -1270,7 +1269,7 @@ describe('The ListAvailableTopics component', () => {
         json: () =>
           Promise.resolve({
             data: dataValue,
-            message: [],
+            messages: [],
           }),
       }),
     );
@@ -1348,7 +1347,7 @@ describe('The ListAvailableTopics component', () => {
         json: () =>
           Promise.resolve({
             data: dataValue,
-            message: [],
+            messages: [],
           }),
       }),
     );
@@ -1431,7 +1430,7 @@ describe('The ListAvailableTopics component', () => {
         json: () =>
           Promise.resolve({
             data: dataValue,
-            message: [],
+            messages: [],
           }),
       }),
     );

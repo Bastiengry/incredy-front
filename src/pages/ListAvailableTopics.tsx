@@ -2,9 +2,7 @@ import { useState, useEffect, ChangeEvent, useCallback } from 'react';
 import { DataTable, DataTableFilterMeta } from 'primereact/datatable';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Column } from 'primereact/column';
-import { Api } from '../api';
 import { useNavigate } from 'react-router-dom';
-import { Topic } from '../types/Topic';
 import { FilterMatchMode } from 'primereact/api';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
@@ -12,11 +10,12 @@ import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 import _ from 'lodash';
 import { Dialog } from 'primereact/dialog';
-import { useNotification } from '../notification';
-import { useHttp } from '../api';
 import { useTranslation } from 'react-i18next';
-import { NotificationMessage, SimplifiedResponse } from '../api/HttpType';
 import { useKeycloak } from '@react-keycloak/web';
+import { Topic } from '../types/Topic';
+import { Api } from '../api';
+import { useNotification } from '../notification';
+import { useHttp, HttpResponseMessage, SimplifiedResponse } from '../http';
 
 export default function ListAvailableTopics() {
   const [topics, setTopics] = useState<Topic[]>([]);
@@ -152,7 +151,7 @@ export default function ListAvailableTopics() {
           setTopics((response?.data || []) as Topic[]);
         } else {
           setEmptyMessageDataTable(t('topic.listTopics.error.errorLoading'));
-          response.messages?.forEach((message: NotificationMessage) => {
+          response.messages?.forEach((message: HttpResponseMessage) => {
             notify(message.type, message.message);
           });
         }

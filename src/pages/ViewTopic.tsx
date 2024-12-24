@@ -3,11 +3,11 @@ import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Message } from 'primereact/message';
-import { Api, useHttp } from '../api';
+import { Api } from '../api';
 import { Topic } from '../types/Topic';
 import { Editor } from '../components';
 import { useNotification } from '../notification';
-import { NotificationMessage } from '../api/HttpType';
+import { useHttp, HttpResponseMessage } from '../http';
 
 function ViewTopic() {
   const { notify } = useNotification();
@@ -27,12 +27,12 @@ function ViewTopic() {
           setTopic(result.data);
         } else {
           let errorMessage = '';
-          result.messages?.forEach((message: NotificationMessage) => {
+          result.messages?.forEach((message: HttpResponseMessage) => {
             errorMessage += message.message + '\n';
           });
 
           setErrorMessage(t('topic.viewTopic.error.loadingTopicError', { errorMessage }));
-          result.messages?.forEach((message: NotificationMessage) => {
+          result.messages?.forEach((message: HttpResponseMessage) => {
             notify(message.type, message.message);
           });
         }
