@@ -20,6 +20,8 @@ module.exports = {
     'reportWebVitals.ts',
     'setupTests.ts',
     'index.tsx',
+    'service-worker.ts',
+    'serviceWorkerRegistration.ts',
   ],
   moduleNameMapper: {
     '\\.(css|less)$': '<rootDir>/__mocks__/styleMock.ts',

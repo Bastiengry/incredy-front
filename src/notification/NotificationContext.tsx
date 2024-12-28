@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useCallback, useRef } from 'react';
+import { createContext, ReactNode, useCallback, useMemo, useRef } from 'react';
 import { Toast } from 'primereact/toast';
 import { NotificationContextType } from './NotificationContextType';
 
@@ -33,11 +33,13 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     });
   }, []);
 
+  const value = useMemo(() => ({
+    notify: notifyMessage,
+  }), [notifyMessage]);
+
   return (
     <NotificationContext.Provider
-      value={{
-        notify: notifyMessage,
-      }}
+      value={value}
     >
       <Toast ref={toast} />
       {children}
