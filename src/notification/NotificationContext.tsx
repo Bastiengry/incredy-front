@@ -41,7 +41,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     <NotificationContext.Provider
       value={value}
     >
-      <Toast ref={toast} />
+      <Toast aria-label="notif-component" ref={toast} />
       {children}
     </NotificationContext.Provider>
   );
