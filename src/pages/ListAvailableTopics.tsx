@@ -47,13 +47,13 @@ export default function ListAvailableTopics() {
   };
 
   const editTopic = (topic: Topic) => {
-    if (topic.id) {
+    if (topic.id || topic.id === 0) {
       navigate(`/edittopic/${topic.id}`);
     }
   };
 
   const deleteTopic = async (topic: Topic | undefined) => {
-    if (topic?.id) {
+    if (topic?.id || topic?.id === 0) {
       await httpDelete(Api.Topic.delete(topic.id));
     }
   };
@@ -73,7 +73,7 @@ export default function ListAvailableTopics() {
   };
 
   const viewTopic = (topic: Topic) => {
-    if (topic.id) {
+    if (topic.id || topic.id === 0) {
       navigate(`/viewtopic/${topic.id}`);
     }
   };

@@ -594,12 +594,89 @@ describe('The ListAvailableTopics component', () => {
     const dataRow0Component = dataRowComponents[0];
 
     // Gets edit button on row 0
-    const editButton = await within(dataRow0Component).findAllByRole('button', {
+    const editButton = await within(dataRow0Component).findByRole('button', {
       name: 'pi-pencil',
     });
-    await waitFor(async () => editButton[0].click());
+    await waitFor(async () => editButton.click());
 
     expect(mockUseNavigate).toHaveBeenCalledWith('/edittopic/1');
+  });
+
+  it('opens topic page when clicking on edit button for topic with ID 0', async () => {
+    const dataValue = [
+      {
+        id: 0,
+        title: 'title0',
+        text: 'text0',
+        createdDate: '2024-09-25 19:20:10',
+        lastModifiedDate: '2024-09-25 19:20:10',
+        creatorUser: 'user',
+      },
+      {
+        id: 1,
+        title: 'title1',
+        text: 'text1',
+        createdDate: '2024-09-25 19:20:11',
+        lastModifiedDate: '2024-09-25 19:20:11',
+        creatorUser: 'user',
+      },
+    ];
+
+    // Mocks the keycloak
+    const keycloak = getKeycloakInstance({
+      authenticated: true,
+      preferred_username: 'user',
+      sub: 'user',
+    });
+
+    jest.spyOn(ReactKeycloakWeb, 'useKeycloak').mockReturnValue({
+      initialized: true,
+      keycloak,
+    });
+
+    // Mocks the fetch
+    mockFetch.mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        json: () =>
+          Promise.resolve({
+            data: dataValue,
+            messages: [],
+          }),
+      }),
+    );
+
+    // Renders the component
+    const router = createMemoryRouter([
+      { path: '*', element: <ListAvailableTopics /> },
+    ]);
+
+    render(<RouterProvider router={router} />);
+
+    // Get the datatable component.
+    const datatableComponent = await screen.findByTestId('datatable');
+    const tableComponent = within(datatableComponent).getByRole('table');
+    // const tbodyComponent = within(tableComponent).getAllByRole(' rowgroup');  // BUG IN PRIMEREACT, SPACE IN ROLE, AND SO NOT POSSIBLE TO FILTER ON TBODY
+
+    const rowComponents = within(tableComponent).getAllByRole('row');
+
+    // Line 1 : header
+    // Line 2 : data rows
+    expect(rowComponents).toHaveLength(3);
+
+    // Gets the data rows
+    const dataRowComponents = rowComponents.slice(1);
+
+    // Gets data row with ID 0
+    const dataRowID0Components = dataRowComponents.filter(dataRow => dataRow.textContent?.includes('title0'));
+
+    // Gets edit button on row 0
+    const editButton = await within(dataRowID0Components[0]).findByRole('button', {
+      name: 'pi-pencil',
+    });
+    await waitFor(() => editButton.click());
+
+    expect(mockUseNavigate).toHaveBeenCalledWith('/edittopic/0');
   });
 
   it('deletes topic when clicking on delete button', async () => {
@@ -668,13 +745,13 @@ describe('The ListAvailableTopics component', () => {
     const dataRow0Component = dataRowComponents[0];
 
     // Click on delete button
-    const deleteButton = await within(dataRow0Component).findAllByRole(
+    const deleteButton = await within(dataRow0Component).findByRole(
       'button',
       {
         name: 'pi-trash',
       },
     );
-    await waitFor(() => deleteButton[0].click());
+    await waitFor(() => deleteButton.click());
 
     // Validation in confirmation dialog
     const deleteDialog = await screen.findByLabelText('delete-dialog');
@@ -688,6 +765,111 @@ describe('The ListAvailableTopics component', () => {
     expect(mockFetch).toHaveBeenNthCalledWith(
       2,
       AppConfConstants.APP_PREFIX + Api.Topic.delete(1),
+      {
+        headers: { 'content-type': 'application/json' },
+        method: 'DELETE',
+      },
+    );
+
+    // Checks the call of the findAll after the delete
+    await waitFor(() => {
+      expect(mockFetch).toHaveBeenNthCalledWith(
+        3,
+        AppConfConstants.APP_PREFIX + Api.Topic.getAll(),
+        {
+          headers: { 'content-type': 'application/json' },
+          method: 'GET',
+        },
+      );
+    });
+  });
+
+  it('deletes topic when clicking on delete button with ID 0', async () => {
+    const dataValue = [
+      {
+        id: 0,
+        title: 'title0',
+        text: 'text0',
+        createdDate: '2024-09-25 19:20:10',
+        lastModifiedDate: '2024-09-25 19:20:10',
+        creatorUser: 'user',
+      },
+      {
+        id: 1,
+        title: 'title1',
+        text: 'text1',
+        createdDate: '2024-09-25 19:20:11',
+        lastModifiedDate: '2024-09-25 19:20:11',
+        creatorUser: 'user',
+      },
+    ];
+
+    const keycloak = getKeycloakInstance({
+      authenticated: true,
+      preferred_username: 'user',
+      sub: 'user',
+    });
+
+    jest.spyOn(ReactKeycloakWeb, 'useKeycloak').mockReturnValue({
+      initialized: true,
+      keycloak,
+    });
+
+    mockFetch.mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        json: () =>
+          Promise.resolve({
+            data: dataValue,
+            messages: [],
+          }),
+      }),
+    );
+
+    const router = createMemoryRouter([
+      { path: '*', element: <ListAvailableTopics /> },
+    ]);
+
+    render(<RouterProvider router={router} />);
+
+    // Get the datatable component.
+    const datatableComponent = await screen.findByTestId('datatable');
+    const tableComponent = within(datatableComponent).getByRole('table');
+    // const tbodyComponent = within(tableComponent).getAllByRole(' rowgroup');  // BUG IN PRIMEREACT, SPACE IN ROLE, AND SO NOT POSSIBLE TO FILTER ON TBODY
+
+    const rowComponents = within(tableComponent).getAllByRole('row');
+
+    // Line 1 : header
+    // Line 2 : data rows
+    expect(rowComponents).toHaveLength(3);
+
+    // Gets the data rows
+    const dataRowComponents = rowComponents.slice(1);
+
+    // Gets data row 0
+    const dataRowID0Components = dataRowComponents.filter(dataRowComponent => dataRowComponent.textContent?.includes('title0'));
+
+    // Click on delete button
+    const deleteButton = await within(dataRowID0Components[0]).findByRole(
+      'button',
+      {
+        name: 'pi-trash',
+      },
+    );
+    await waitFor(() => deleteButton.click());
+
+    // Validation in confirmation dialog
+    const deleteDialog = await screen.findByLabelText('delete-dialog');
+    const validateButton = await within(deleteDialog).findByLabelText('yes-button');
+    await waitFor(() => validateButton.click());
+
+    // Wait for the confirmation dialog to close
+    await waitFor(() => expect(deleteDialog).not.toBeInTheDocument());
+
+    // Checks the call of the delete API.
+    expect(mockFetch).toHaveBeenNthCalledWith(
+      2,
+      AppConfConstants.APP_PREFIX + Api.Topic.delete(0),
       {
         headers: { 'content-type': 'application/json' },
         method: 'DELETE',
@@ -776,13 +958,13 @@ describe('The ListAvailableTopics component', () => {
     const dataRow0Component = dataRowComponents[0];
 
     // Click on delete button
-    const deleteButton = await within(dataRow0Component).findAllByRole(
+    const deleteButton = await within(dataRow0Component).findByRole(
       'button',
       {
         name: 'pi-trash',
       },
     );
-    await waitFor(() => deleteButton[0].click());
+    await waitFor(() => deleteButton.click());
 
     // Get the confirmation dialog
     const deleteDialog = await screen.findByLabelText('delete-dialog');
@@ -874,13 +1056,13 @@ describe('The ListAvailableTopics component', () => {
     const dataRow0Component = dataRowComponents[0];
 
     // Click on delete button
-    const deleteButton = await within(dataRow0Component).findAllByRole(
+    const deleteButton = await within(dataRow0Component).findByRole(
       'button',
       {
         name: 'pi-trash',
       },
     );
-    await waitFor(() => deleteButton[0].click());
+    await waitFor(() => deleteButton.click());
 
     // Get the confirmation dialog
     const deleteDialog = await screen.findByLabelText('delete-dialog');
@@ -962,13 +1144,79 @@ describe('The ListAvailableTopics component', () => {
     const dataRow0Component = dataRowComponents[0];
 
     // Click on view button
-    const viewButton = await within(dataRow0Component).findAllByRole('button', {
+    const viewButton = await within(dataRow0Component).findByRole('button', {
       name: 'pi-eye',
     });
-    await waitFor(async () => viewButton[0].click());
+    await waitFor(async () => viewButton.click());
 
     // Checks the call of the navigate to go to view page.
     expect(mockUseNavigate).toHaveBeenCalledWith('/viewtopic/1');
+  });
+
+  it('opens view topic page when clicking on view button with ID 0', async () => {
+    const dataValue = [
+      {
+        id: 0,
+        title: 'title0',
+        text: 'text0',
+        createdDate: '2024-09-25 19:20:10',
+        lastModifiedDate: '2024-09-25 19:20:10',
+        creatorUser: 'user',
+      },
+      {
+        id: 1,
+        title: 'title1',
+        text: 'text1',
+        createdDate: '2024-09-25 19:20:11',
+        lastModifiedDate: '2024-09-25 19:20:11',
+        creatorUser: 'user',
+      },
+    ];
+
+    // Mocks the fetch
+    mockFetch.mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        json: () =>
+          Promise.resolve({
+            data: dataValue,
+            messages: [],
+          }),
+      }),
+    );
+
+    // Renders the component
+    const router = createMemoryRouter([
+      { path: '*', element: <ListAvailableTopics /> },
+    ]);
+
+    render(<RouterProvider router={router} />);
+
+    // Get the datatable component.
+    const datatableComponent = await screen.findByTestId('datatable');
+    const tableComponent = within(datatableComponent).getByRole('table');
+    // const tbodyComponent = within(tableComponent).getAllByRole(' rowgroup');  // BUG IN PRIMEREACT, SPACE IN ROLE, AND SO NOT POSSIBLE TO FILTER ON TBODY
+
+    const rowComponents = within(tableComponent).getAllByRole('row');
+
+    // Line 1 : header
+    // Line 2 : data rows
+    expect(rowComponents).toHaveLength(3);
+
+    // Gets the data rows
+    const dataRowComponents = rowComponents.slice(1);
+
+    // Gets data row with ID 0
+    const dataRowID0Components = dataRowComponents.filter(dataRow => dataRow.textContent?.includes('title0'));
+
+    // Click on view button
+    const viewButton = await within(dataRowID0Components[0]).findByRole('button', {
+      name: 'pi-eye',
+    });
+    await waitFor(async () => viewButton.click());
+
+    // Checks the call of the navigate to go to view page.
+    expect(mockUseNavigate).toHaveBeenCalledWith('/viewtopic/0');
   });
 
   it('opens view topic page when selecting a row', async () => {
