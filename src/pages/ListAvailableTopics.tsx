@@ -206,6 +206,7 @@ export default function ListAvailableTopics() {
         label={t('topic.listTopics.deleteConfirmDialog.buttons.no')}
         icon="pi pi-times"
         outlined
+        name="no-button"
         aria-label="no-button"
         onClick={deleteModalDeleteTopicCancelled}
       />
@@ -213,6 +214,7 @@ export default function ListAvailableTopics() {
         label={t('topic.listTopics.deleteConfirmDialog.buttons.yes')}
         icon="pi pi-check"
         severity="danger"
+        name="yes-button"
         aria-label="yes-button"
         onClick={deleteModalDeleteTopicConfirmed}
       />
@@ -265,6 +267,7 @@ export default function ListAvailableTopics() {
                   pt={{
                     root: () => ({
                       'aria-label': 'delete-dialog',
+                      'id': 'delete-dialog',
                     }),
                     closeButton: () => ({
                       'aria-label': 'delete-dialog-close-button',
