@@ -59,6 +59,13 @@ export default function Header() {
                 },
               },
             ]}
+            pt={{
+              menuButton: {
+                root: {
+                  id: 'user-info-expand-menu',
+                },
+              },
+            }}
             text
             severity="secondary"
           />
