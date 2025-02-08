@@ -1,12 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-jest.mock('./security', () => ({
-  keycloak: {
-    init: jest.fn().mockImplementation(() => ({
-      catch: jest.fn(),
-    })),
-  },
+jest.mock('./keycloak', () => ({
+  KeycloakProvider: () => <></>,
 }));
 
 jest.mock('./router', () => {

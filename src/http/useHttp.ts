@@ -1,5 +1,5 @@
 import { HttpHookType, HttpOptions, SimplifiedResponse } from './HttpType';
-import { useKeycloak } from '@react-keycloak/web';
+import { useKeycloak } from '../keycloak';
 import HttpConstants from './HttpConstants';
 import AppConfConstants from '../AppConfConstants';
 import { useCallback } from 'react';

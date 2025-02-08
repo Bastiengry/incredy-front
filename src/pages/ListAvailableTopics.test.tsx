@@ -2,9 +2,8 @@ import '../../public/appConfig';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import ListAvailableTopics from './ListAvailableTopics';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
-import ReactKeycloakWeb from '@react-keycloak/web';
 import { Api } from '../api';
-import Keycloak, { KeycloakProfile } from 'keycloak-js';
+import Keycloak from 'keycloak-js';
 import userEvent from '@testing-library/user-event';
 import * as TestNotification from '../notification';
 import AppConfConstants from '../AppConfConstants';
@@ -37,11 +36,14 @@ jest.mock('react-router-dom', () => ({
   useNavigate: () => mockUseNavigate,
 }));
 
-jest.mock('@react-keycloak/web', () => ({
-  ...jest.requireActual('@react-keycloak/web'),
-  useKeycloak: jest.fn().mockImplementation(() => ({
+const mockUseKeycloak = jest.fn().mockImplementation(() => {
+  return {
     keycloak: null,
-  })),
+  };
+});
+
+jest.mock('../keycloak', () => ({
+  useKeycloak: () => mockUseKeycloak(),
 }));
 
 jest.mock('../notification', () => ({
@@ -64,22 +66,22 @@ const getKeycloakInstance = ({
     preferred_username: preferred_username || null,
     sub: sub,
   },
-  init: (): Promise<boolean> => new Promise(() => {}),
-  login: (): Promise<void> => new Promise(() => {}),
-  logout: (): Promise<void> => new Promise(() => {}),
-  register: (): Promise<void> => new Promise(() => {}),
-  accountManagement: (): Promise<void> => new Promise<void>(() => {}),
-  createLoginUrl: () => '',
-  createLogoutUrl: () => '',
-  createRegisterUrl: () => '',
-  createAccountUrl: () => '',
-  isTokenExpired: () => false,
-  updateToken: () => new Promise(() => {}),
-  clearToken: () => {},
-  hasRealmRole: () => true,
-  hasResourceRole: () => false,
-  loadUserProfile: (): Promise<KeycloakProfile> => new Promise(() => {}),
-  loadUserInfo: (): Promise<object> => new Promise(() => {}),
+  init: jest.fn(),
+  login: jest.fn(),
+  logout: jest.fn(),
+  register: jest.fn(),
+  accountManagement: jest.fn(),
+  createLoginUrl: jest.fn(),
+  createLogoutUrl: jest.fn(),
+  createRegisterUrl: jest.fn(),
+  createAccountUrl: jest.fn(),
+  isTokenExpired: jest.fn(),
+  updateToken: jest.fn(),
+  clearToken: jest.fn(),
+  hasRealmRole: jest.fn(),
+  hasResourceRole: jest.fn(),
+  loadUserProfile: jest.fn(),
+  loadUserInfo: jest.fn(),
 });
 
 const mockNotify = jest.fn();
@@ -287,7 +289,7 @@ describe('The ListAvailableTopics component', () => {
       sub: 'user',
     });
 
-    jest.spyOn(ReactKeycloakWeb, 'useKeycloak').mockReturnValue({
+    mockUseKeycloak.mockReturnValue({
       initialized: true,
       keycloak,
     });
@@ -493,7 +495,6 @@ describe('The ListAvailableTopics component', () => {
         url === AppConfConstants.APP_PREFIX + Api.Topic.getAll()
         && init?.method === 'GET'
       ) {
-        // eslint-disable-next-line no-throw-literal
         throw null;
       }
     });
@@ -552,7 +553,7 @@ describe('The ListAvailableTopics component', () => {
       sub: 'user',
     });
 
-    jest.spyOn(ReactKeycloakWeb, 'useKeycloak').mockReturnValue({
+    mockUseKeycloak.mockReturnValue({
       initialized: true,
       keycloak,
     });
@@ -629,7 +630,7 @@ describe('The ListAvailableTopics component', () => {
       sub: 'user',
     });
 
-    jest.spyOn(ReactKeycloakWeb, 'useKeycloak').mockReturnValue({
+    mockUseKeycloak.mockReturnValue({
       initialized: true,
       keycloak,
     });
@@ -705,7 +706,7 @@ describe('The ListAvailableTopics component', () => {
       sub: 'user',
     });
 
-    jest.spyOn(ReactKeycloakWeb, 'useKeycloak').mockReturnValue({
+    mockUseKeycloak.mockReturnValue({
       initialized: true,
       keycloak,
     });
@@ -810,7 +811,7 @@ describe('The ListAvailableTopics component', () => {
       sub: 'user',
     });
 
-    jest.spyOn(ReactKeycloakWeb, 'useKeycloak').mockReturnValue({
+    mockUseKeycloak.mockReturnValue({
       initialized: true,
       keycloak,
     });
@@ -916,7 +917,7 @@ describe('The ListAvailableTopics component', () => {
       sub: 'user',
     });
 
-    jest.spyOn(ReactKeycloakWeb, 'useKeycloak').mockReturnValue({
+    mockUseKeycloak.mockReturnValue({
       initialized: true,
       keycloak,
     });
@@ -1014,7 +1015,7 @@ describe('The ListAvailableTopics component', () => {
       sub: 'user',
     });
 
-    jest.spyOn(ReactKeycloakWeb, 'useKeycloak').mockReturnValue({
+    mockUseKeycloak.mockReturnValue({
       initialized: true,
       keycloak,
     });
@@ -1371,7 +1372,8 @@ describe('The ListAvailableTopics component', () => {
     // Gets the filter component
     const filterComponent = within(datatableComponent).getByLabelText('filter');
     const filterTextComponent = within(filterComponent).getByLabelText('filter-text');
-    userEvent.type(filterTextComponent, 'title2');
+    await waitFor(() => userEvent.type(filterTextComponent, 'title2'));
+    screen.debug(filterTextComponent);
     expect(filterTextComponent).toHaveValue('title2');
 
     // CONTROLS AFTER ADDING FILTER
@@ -1390,7 +1392,7 @@ describe('The ListAvailableTopics component', () => {
     const filterButtonClearComponent = within(filterComponent).getByLabelText(
       'filter-button-clear',
     );
-    userEvent.click(filterButtonClearComponent);
+    await waitFor(() => userEvent.click(filterButtonClearComponent));
 
     // No filter anymore
     expect(filterTextComponent).toHaveValue('');
@@ -1505,7 +1507,7 @@ describe('The ListAvailableTopics component', () => {
       sub: 'user',
     });
 
-    jest.spyOn(ReactKeycloakWeb, 'useKeycloak').mockReturnValue({
+    mockUseKeycloak.mockReturnValue({
       initialized: true,
       keycloak,
     });
@@ -1584,7 +1586,7 @@ describe('The ListAvailableTopics component', () => {
       sub: 'user',
     });
 
-    jest.spyOn(ReactKeycloakWeb, 'useKeycloak').mockReturnValue({
+    mockUseKeycloak.mockReturnValue({
       initialized: true,
       keycloak,
     });

@@ -15,7 +15,6 @@ interface Props {
 export default function Editor({
   text,
   ariaLabel = 'editor',
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   onText = () => {},
   style = {
     height: '382px',

@@ -1,6 +1,6 @@
 # Use the official Node.js runtime as the base image
 # Step useful to set environment variables via Docker
-FROM node:18 as build
+FROM node:23 as build
 
 # Set the working directory in the container
 WORKDIR /app
@@ -24,7 +24,7 @@ FROM nginx:alpine
 ARG APP_CONFIG_FILE_PATH
 
 # Copy the built React app to Nginx's web server directory
-COPY --from=build /app/build /usr/share/nginx/html
+COPY --from=build /app/dist /usr/share/nginx/html
 
 # Replace the appConfig.js
 COPY $APP_CONFIG_FILE_PATH /usr/share/nginx/html/appConfig.js

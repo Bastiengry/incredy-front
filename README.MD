@@ -42,6 +42,3 @@
 - The variable MyConst is then accessible globally
 - To access the variable from typescript (in "src" folder): "(window as any).MyConst"
 
-### MSW
-
-https://mswjs.io/docs/api/life-cycle-events/

@@ -1,18 +1,23 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Header from './Header';
-import ReactRouterDom, { MemoryRouter } from 'react-router-dom';
-import Keycloak, { KeycloakProfile } from 'keycloak-js';
-import ReactKeycloakWeb from '@react-keycloak/web';
+import { MemoryRouter } from 'react-router';
+import Keycloak from 'keycloak-js';
 
-jest.mock('@react-keycloak/web', () => ({
-  ...jest.requireActual('@react-keycloak/web'),
-  useKeycloak: jest.fn(),
+const mockUseKeycloak = jest.fn().mockImplementation(() => {
+  return {
+    keycloak: null,
+  };
+});
+
+jest.mock('../keycloak', () => ({
+  useKeycloak: () => mockUseKeycloak(),
 }));
 
+const mockUseNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useNavigate: jest.fn(),
+  useNavigate: () => mockUseNavigate,
 }));
 
 const t = (str: string) => str;
@@ -38,22 +43,22 @@ const getKeycloakInstance = ({
   tokenParsed: {
     preferred_username: preferred_username || null,
   },
-  init: (): Promise<boolean> => new Promise(() => {}),
-  login: (): Promise<void> => new Promise(() => {}),
-  logout: (): Promise<void> => new Promise(() => {}),
-  register: (): Promise<void> => new Promise(() => {}),
-  accountManagement: (): Promise<void> => new Promise<void>(() => {}),
-  createLoginUrl: () => '',
-  createLogoutUrl: () => '',
-  createRegisterUrl: () => '',
-  createAccountUrl: () => '',
-  isTokenExpired: () => false,
-  updateToken: () => new Promise(() => {}),
-  clearToken: () => {},
-  hasRealmRole: () => true,
-  hasResourceRole: () => false,
-  loadUserProfile: (): Promise<KeycloakProfile> => new Promise(() => {}),
-  loadUserInfo: (): Promise<object> => new Promise(() => {}),
+  init: jest.fn(),
+  login: jest.fn(),
+  logout: jest.fn(),
+  register: jest.fn(),
+  accountManagement: jest.fn(),
+  createLoginUrl: jest.fn(),
+  createLogoutUrl: jest.fn(),
+  createRegisterUrl: jest.fn(),
+  createAccountUrl: jest.fn(),
+  isTokenExpired: jest.fn(),
+  updateToken: jest.fn(),
+  clearToken: jest.fn(),
+  hasRealmRole: jest.fn(),
+  hasResourceRole: jest.fn(),
+  loadUserProfile: jest.fn(),
+  loadUserInfo: jest.fn(),
 });
 
 const headerRoutes = ['/', '/edittopic/add'];
@@ -64,7 +69,7 @@ describe('The Header component', () => {
       authenticated: false,
     });
 
-    jest.spyOn(ReactKeycloakWeb, 'useKeycloak').mockReturnValue({
+    mockUseKeycloak.mockReturnValue({
       initialized: true,
       keycloak,
     });
@@ -104,7 +109,7 @@ describe('The Header component', () => {
       preferred_username: 'user',
     });
 
-    jest.spyOn(ReactKeycloakWeb, 'useKeycloak').mockReturnValue({
+    mockUseKeycloak.mockReturnValue({
       initialized: true,
       keycloak,
     });
@@ -143,7 +148,7 @@ describe('The Header component', () => {
 
     // Click on the button to open logout menu
     const btnsInternalLogout = within(btnLogout).getAllByRole('button');
-    userEvent.click(btnsInternalLogout[1]);
+    await waitFor(() => userEvent.click(btnsInternalLogout[1]));
 
     // Check the presence of logout menu item when the menu is open
     const logoutMenuItem = await screen.findByLabelText(
@@ -157,13 +162,10 @@ describe('The Header component', () => {
       authenticated: false,
     });
 
-    jest.spyOn(ReactKeycloakWeb, 'useKeycloak').mockImplementation(() => ({
+    mockUseKeycloak.mockImplementation(() => ({
       initialized: true,
       keycloak,
     }));
-
-    const mockNavigate = jest.fn();
-    jest.spyOn(ReactRouterDom, 'useNavigate').mockReturnValue(mockNavigate);
 
     render(
       <MemoryRouter initialEntries={headerRoutes}>
@@ -184,10 +186,10 @@ describe('The Header component', () => {
     );
 
     // Click on the Home link
-    userEvent.click(insideLinkElement);
+    await waitFor(() => userEvent.click(insideLinkElement));
 
     // Check the call of the home page
-    expect(mockNavigate).toHaveBeenCalledWith('/');
+    expect(mockUseNavigate).toHaveBeenCalledWith('/');
   });
 
   it('redirects to add topic page when clicking add topic button', async () => {
@@ -196,13 +198,10 @@ describe('The Header component', () => {
       preferred_username: 'user',
     });
 
-    jest.spyOn(ReactKeycloakWeb, 'useKeycloak').mockImplementation(() => ({
+    mockUseKeycloak.mockImplementation(() => ({
       initialized: true,
       keycloak,
     }));
-
-    const mockNavigate = jest.fn();
-    jest.spyOn(ReactRouterDom, 'useNavigate').mockReturnValue(mockNavigate);
 
     render(
       <MemoryRouter initialEntries={headerRoutes}>
@@ -223,10 +222,10 @@ describe('The Header component', () => {
     );
 
     // Click on the Home link
-    userEvent.click(insideLinkElement);
+    await waitFor(() => userEvent.click(insideLinkElement));
 
     // Check the call of the add topic page
-    expect(mockNavigate).toHaveBeenCalledWith('/edittopic/add');
+    expect(mockUseNavigate).toHaveBeenCalledWith('/edittopic/add');
   });
 
   it('logs in page when clicking login button', async () => {
@@ -236,7 +235,7 @@ describe('The Header component', () => {
 
     const keycloakLoginSpy = jest.spyOn(keycloak, 'login');
 
-    jest.spyOn(ReactKeycloakWeb, 'useKeycloak').mockImplementation(() => ({
+    mockUseKeycloak.mockImplementation(() => ({
       initialized: true,
       keycloak,
     }));
@@ -253,7 +252,7 @@ describe('The Header component', () => {
     const btnLogin = within(headerComponent).getByLabelText('btn-login');
 
     // Click on the login button
-    userEvent.click(btnLogin);
+    await waitFor(() => userEvent.click(btnLogin));
 
     // Check the call to login
     expect(keycloakLoginSpy).toHaveBeenCalled();
@@ -267,7 +266,7 @@ describe('The Header component', () => {
 
     const keycloakLogoutSpy = jest.spyOn(keycloak, 'logout');
 
-    jest.spyOn(ReactKeycloakWeb, 'useKeycloak').mockImplementation(() => ({
+    mockUseKeycloak.mockImplementation(() => ({
       initialized: true,
       keycloak,
     }));
@@ -285,7 +284,7 @@ describe('The Header component', () => {
 
     // Click on the button to open logout menu
     const btnsInternalLogout = within(btnLogout).getAllByRole('button');
-    userEvent.click(btnsInternalLogout[1]);
+    await waitFor(() => userEvent.click(btnsInternalLogout[1]));
 
     // Get the logout menu item when the menu is open
     const logoutMenuItemComponent = await screen.findByLabelText(
@@ -298,7 +297,7 @@ describe('The Header component', () => {
     );
 
     // Click on the link to logout
-    userEvent.click(insideLinkElement);
+    await waitFor(() => userEvent.click(insideLinkElement));
 
     // Check the call to logout
     expect(keycloakLogoutSpy).toHaveBeenCalled();
