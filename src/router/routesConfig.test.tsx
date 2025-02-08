@@ -1,22 +1,21 @@
 import { render, screen } from '@testing-library/react';
-import { createMemoryRouter, RouterProvider } from 'react-router-dom';
+import { createMemoryRouter, RouterProvider } from 'react-router';
 import routesConfig from './routesConfig';
-import ReactKeycloakWeb from '@react-keycloak/web';
-import Keycloak, { KeycloakProfile } from 'keycloak-js';
+import Keycloak from 'keycloak-js';
 
-jest.mock('../security', () => ({
+const mockUseKeycloak = jest.fn().mockImplementation(() => {
+  return {
+    keycloak: null,
+  };
+});
+
+jest.mock('../keycloak', () => ({
+  useKeycloak: () => mockUseKeycloak(),
   keycloak: {
     init: jest.fn().mockImplementation(() => ({
       catch: jest.fn(),
     })),
   },
-}));
-
-jest.mock('@react-keycloak/web', () => ({
-  ...jest.requireActual('@react-keycloak/web'),
-  useKeycloak: jest.fn().mockImplementation(() => ({
-    keycloak: null,
-  })),
 }));
 
 const getKeycloakInstance = ({
@@ -33,22 +32,22 @@ const getKeycloakInstance = ({
     preferred_username: preferred_username || null,
     sub: sub,
   },
-  init: (): Promise<boolean> => new Promise(() => {}),
-  login: (): Promise<void> => new Promise(() => {}),
-  logout: (): Promise<void> => new Promise(() => {}),
-  register: (): Promise<void> => new Promise(() => {}),
-  accountManagement: (): Promise<void> => new Promise<void>(() => {}),
-  createLoginUrl: () => '',
-  createLogoutUrl: () => '',
-  createRegisterUrl: () => '',
-  createAccountUrl: () => '',
-  isTokenExpired: () => false,
-  updateToken: () => new Promise(() => {}),
-  clearToken: () => {},
-  hasRealmRole: () => true,
-  hasResourceRole: () => false,
-  loadUserProfile: (): Promise<KeycloakProfile> => new Promise(() => {}),
-  loadUserInfo: (): Promise<object> => new Promise(() => {}),
+  init: jest.fn(),
+  login: jest.fn(),
+  logout: jest.fn(),
+  register: jest.fn(),
+  accountManagement: jest.fn(),
+  createLoginUrl: jest.fn(),
+  createLogoutUrl: jest.fn(),
+  createRegisterUrl: jest.fn(),
+  createAccountUrl: jest.fn(),
+  isTokenExpired: jest.fn(),
+  updateToken: jest.fn(),
+  clearToken: jest.fn(),
+  hasRealmRole: jest.fn(),
+  hasResourceRole: jest.fn(),
+  loadUserProfile: jest.fn(),
+  loadUserInfo: jest.fn(),
 });
 
 jest.mock('../pages', () => ({
@@ -62,6 +61,10 @@ jest.mock('../components', () => ({
 }));
 
 describe('The routesConfig ', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('displays properly home page', async () => {
     const router = createMemoryRouter(routesConfig, {
       initialEntries: ['/'],
@@ -79,7 +82,7 @@ describe('The routesConfig ', () => {
       sub: 'user',
     });
 
-    jest.spyOn(ReactKeycloakWeb, 'useKeycloak').mockReturnValue({
+    mockUseKeycloak.mockReturnValue({
       initialized: true,
       keycloak,
     });

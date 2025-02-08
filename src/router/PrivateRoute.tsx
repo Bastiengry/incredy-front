@@ -1,4 +1,4 @@
-import { useKeycloak } from '@react-keycloak/web';
+import { useKeycloak } from '../keycloak';
 import { ReactNode } from 'react';
 
 const PrivateRoute = ({ children }: { children: ReactNode }) => {

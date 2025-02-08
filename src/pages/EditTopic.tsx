@@ -4,7 +4,6 @@ import Editor from '../components/Editor';
 import { Api } from '../api';
 import { useHttp, HttpResponseMessage, SimplifiedResponse } from '../http';
 import { useNavigate, useParams } from 'react-router-dom';
-import _ from 'lodash';
 import { InputText } from 'primereact/inputtext';
 import { useTranslation } from 'react-i18next';
 import { useNotification } from '../notification';
@@ -41,7 +40,6 @@ export default function EditTopic() {
   const { notify } = useNotification();
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState<string>('');
-
   const isNumber = (value: string) => {
     const valNumber = parseInt(value);
     return !isNaN(valNumber) && isFinite(valNumber);
@@ -68,7 +66,7 @@ export default function EditTopic() {
         );
         if (result.status === 'SUCCESS') {
           setBackendData({ ...result.data } as FormData);
-          setFormData(_.cloneDeep(result.data) as FormData);
+          setFormData(structuredClone(result.data) as FormData);
         } else {
           let errorMessage = '';
           result.messages?.forEach((message: HttpResponseMessage) => {
@@ -99,7 +97,7 @@ export default function EditTopic() {
     param: string,
     value: string | number | undefined | null,
   ) => {
-    const newFormData: FormData = _.cloneDeep(formData);
+    const newFormData: FormData = structuredClone(formData);
     newFormData[param as keyof FormData] = value;
     setFormData(newFormData);
   };
@@ -137,7 +135,7 @@ export default function EditTopic() {
   };
 
   const onCancel = async () => {
-    setFormData(_.cloneDeep(backendData));
+    setFormData(structuredClone(backendData));
   };
 
   useEffect(() => {

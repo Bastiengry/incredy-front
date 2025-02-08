@@ -8,10 +8,9 @@ import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
-import _ from 'lodash';
 import { Dialog } from 'primereact/dialog';
 import { useTranslation } from 'react-i18next';
-import { useKeycloak } from '@react-keycloak/web';
+import { useKeycloak } from '../keycloak';
 import { Topic } from '../types/Topic';
 import { Api } from '../api';
 import { useNotification } from '../notification';
@@ -122,7 +121,7 @@ export default function ListAvailableTopics() {
 
   const onGlobalFilterChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event?.target?.value;
-    let _filters = _.cloneDeep(filters);
+    let _filters = structuredClone(filters);
     if (!_filters) {
       _filters = {};
     }
@@ -194,7 +193,7 @@ export default function ListAvailableTopics() {
 
   const deleteModalDeleteTopicConfirmed = async () => {
     setOpenModalDeleteTopic(false);
-    const topic = _.cloneDeep(topicToDelete);
+    const topic = structuredClone(topicToDelete);
     setTopicToDelete(undefined);
     await deleteTopic(topic);
     findAllTopics();

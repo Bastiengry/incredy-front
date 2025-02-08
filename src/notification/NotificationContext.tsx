@@ -3,7 +3,6 @@ import { Toast } from 'primereact/toast';
 import { NotificationContextType } from './NotificationContextType';
 
 export const NotificationContext = createContext<NotificationContextType>({
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   notify: () => {},
 });
 

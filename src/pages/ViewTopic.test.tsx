@@ -1,6 +1,6 @@
 import '../../public/appConfig';
 import { render, screen, waitFor } from '@testing-library/react';
-import ReactRouterDom, { createMemoryRouter, RouterProvider } from 'react-router-dom';
+import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import { Api } from '../api';
 import ViewTopic from './ViewTopic';
 import { EditorProps } from 'primereact/editor';
@@ -14,14 +14,17 @@ global.fetch = jest.fn(mockFetch) as jest.Mock;
 const mockUseParams = jest.fn().mockImplementation(() => {});
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useParams: () => mockUseParams,
+  useParams: () => mockUseParams(),
 }));
 
-jest.mock('@react-keycloak/web', () => ({
-  ...jest.requireActual('@react-keycloak/web'),
-  useKeycloak: jest.fn().mockImplementation(() => ({
+const mockUseKeycloak = jest.fn().mockImplementation(() => {
+  return {
     keycloak: null,
-  })),
+  };
+});
+
+jest.mock('../keycloak', () => ({
+  useKeycloak: () => mockUseKeycloak(),
 }));
 
 const mockT = jest.fn().mockImplementation((str: string) => str);
@@ -98,7 +101,7 @@ describe('The ViewTopic component', () => {
     });
 
     // Mocks the path parameters in the URL
-    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({ topicId: '1' });
+    mockUseParams.mockReturnValue({ topicId: '1' });
 
     // Renders the component
     const router = createMemoryRouter([
@@ -146,7 +149,7 @@ describe('The ViewTopic component', () => {
     });
 
     // Mocks the path parameters in the URL
-    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({ topicId: '1' });
+    mockUseParams.mockReturnValue({ topicId: '1' });
 
     // Renders the component
     const router = createMemoryRouter([
@@ -187,7 +190,7 @@ describe('The ViewTopic component', () => {
     });
 
     // Mocks the path parameters in the URL
-    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({ topicId: '1' });
+    mockUseParams.mockReturnValue({ topicId: '1' });
 
     // Renders the component
     const router = createMemoryRouter([
@@ -217,7 +220,7 @@ describe('The ViewTopic component', () => {
 
   it('show error message when missing topic ID in URL', async () => {
     // Mocks the path parameters in the URL
-    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({ topicId: undefined });
+    mockUseParams.mockReturnValue({ topicId: undefined });
 
     // Renders the component
     const router = createMemoryRouter([

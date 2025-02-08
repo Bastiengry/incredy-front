@@ -1,9 +1,9 @@
 import '../../public/appConfig';
 import { render, screen, waitFor } from '@testing-library/react';
-import ReactRouterDom, {
+import {
   createMemoryRouter,
   RouterProvider,
-} from 'react-router-dom';
+} from 'react-router';
 import EditTopic from './EditTopic';
 import { EditorProps } from 'primereact/editor';
 import { Api } from '../api';
@@ -55,18 +55,24 @@ jest.mock('react-i18next', () => ({
 }));
 
 const mockUseNavigate = jest.fn().mockImplementation(() => {});
+const mockUseParam = jest.fn().mockImplementation(() => {});
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
+  // Returns a function
   useNavigate: () => mockUseNavigate,
-  useParams: jest.fn(),
+  // Return an object
+  useParams: () => mockUseParam(),
 }));
 
-jest.mock('@react-keycloak/web', () => ({
-  ...jest.requireActual('@react-keycloak/web'),
-  useKeycloak: jest.fn().mockImplementation(() => ({
+const mockUseKeycloak = jest.fn().mockImplementation(() => {
+  return {
     keycloak: null,
-  })),
+  };
+});
+
+jest.mock('../keycloak', () => ({
+  useKeycloak: () => mockUseKeycloak(),
 }));
 
 jest.mock('../notification', () => ({
@@ -90,7 +96,7 @@ describe('The EditTopic component', () => {
 
   it('displays empty editor if open in ADD mode', async () => {
     // Mocks the path parameters in the URL
-    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({ topicId: 'add' });
+    mockUseParam.mockReturnValue({ topicId: 'add' });
 
     // Renders the component
     const router = createMemoryRouter([{ path: '*', element: <EditTopic /> }]);
@@ -136,7 +142,7 @@ describe('The EditTopic component', () => {
     });
 
     // Mocks the path parameters in the URL
-    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({ topicId: '1' });
+    mockUseParam.mockReturnValue({ topicId: '1' });
 
     // Renders the component
     const router = createMemoryRouter([{ path: '*', element: <EditTopic /> }]);
@@ -174,7 +180,7 @@ describe('The EditTopic component', () => {
     });
 
     // Mocks the path parameters in the URL
-    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({ topicId: '1' });
+    mockUseParam.mockReturnValue({ topicId: '1' });
 
     // Renders the component
     const router = createMemoryRouter([{ path: '*', element: <EditTopic /> }]);
@@ -201,7 +207,7 @@ describe('The EditTopic component', () => {
     });
 
     // Mocks the path parameters in the URL
-    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({ topicId: '1' });
+    mockUseParam.mockReturnValue({ topicId: '1' });
 
     // Renders the component
     const router = createMemoryRouter([{ path: '*', element: <EditTopic /> }]);
@@ -228,7 +234,7 @@ describe('The EditTopic component', () => {
     });
 
     // Mocks the path parameters in the URL
-    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({ topicId: '1' });
+    mockUseParam.mockReturnValue({ topicId: '1' });
 
     // Renders the component
     const router = createMemoryRouter([{ path: '*', element: <EditTopic /> }]);
@@ -257,7 +263,7 @@ describe('The EditTopic component', () => {
     });
 
     // Mocks the path parameter in the URL to open topic creation page
-    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({ topicId: 'add' });
+    mockUseParam.mockReturnValue({ topicId: 'add' });
 
     // Renders the component
     const router = createMemoryRouter([{ path: '*', element: <EditTopic /> }]);
@@ -270,9 +276,9 @@ describe('The EditTopic component', () => {
     expect(editorComponent).toHaveValue('');
 
     // Set data
-    userEvent.type(titleComponent, 'new title 1');
+    await waitFor(() => userEvent.type(titleComponent, 'new title 1'));
     expect(titleComponent).toHaveValue('new title 1');
-    userEvent.type(editorComponent, 'new content 1');
+    await waitFor(() => userEvent.type(editorComponent, 'new content 1'));
     expect(editorComponent).toHaveValue('new content 1');
 
     // Click on submit button
@@ -325,7 +331,7 @@ describe('The EditTopic component', () => {
     });
 
     // Mocks the path parameter in the URL to open topic creation page
-    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({ topicId: 'add' });
+    mockUseParam.mockReturnValue({ topicId: 'add' });
 
     // Renders the component
     const router = createMemoryRouter([{ path: '*', element: <EditTopic /> }]);
@@ -338,9 +344,9 @@ describe('The EditTopic component', () => {
     expect(editorComponent).toHaveValue('');
 
     // Set data
-    userEvent.type(titleComponent, 'new title 1');
+    await waitFor(() => userEvent.type(titleComponent, 'new title 1'));
     expect(titleComponent).toHaveValue('new title 1');
-    userEvent.type(editorComponent, 'new content 1');
+    await waitFor(() => userEvent.type(editorComponent, 'new content 1'));
     expect(editorComponent).toHaveValue('new content 1');
 
     // Click on submit button
@@ -382,7 +388,7 @@ describe('The EditTopic component', () => {
     });
 
     // Mocks the path parameter in the URL to open topic creation page
-    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({ topicId: 'add' });
+    mockUseParam.mockReturnValue({ topicId: 'add' });
 
     // Renders the component
     const router = createMemoryRouter([{ path: '*', element: <EditTopic /> }]);
@@ -395,9 +401,9 @@ describe('The EditTopic component', () => {
     expect(editorComponent).toHaveValue('');
 
     // Set data
-    userEvent.type(titleComponent, 'new title 1');
+    await waitFor(() => userEvent.type(titleComponent, 'new title 1'));
     expect(titleComponent).toHaveValue('new title 1');
-    userEvent.type(editorComponent, 'new content 1');
+    await waitFor(() => userEvent.type(editorComponent, 'new content 1'));
     expect(editorComponent).toHaveValue('new content 1');
 
     // Click on submit button
@@ -439,7 +445,7 @@ describe('The EditTopic component', () => {
     });
 
     // Mocks the path parameter in the URL to open topic creation page
-    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({ topicId: 'add' });
+    mockUseParam.mockReturnValue({ topicId: 'add' });
 
     // Renders the component
     const router = createMemoryRouter([{ path: '*', element: <EditTopic /> }]);
@@ -452,9 +458,9 @@ describe('The EditTopic component', () => {
     expect(editorComponent).toHaveValue('');
 
     // Set data
-    userEvent.type(titleComponent, 'new title 1');
+    await waitFor(() => userEvent.type(titleComponent, 'new title 1'));
     expect(titleComponent).toHaveValue('new title 1');
-    userEvent.type(editorComponent, 'new content 1');
+    await waitFor(() => userEvent.type(editorComponent, 'new content 1'));
     expect(editorComponent).toHaveValue('new content 1');
 
     // Click on submit button
@@ -512,7 +518,7 @@ describe('The EditTopic component', () => {
     });
 
     // Mocks the path parameter in the URL to open topic creation page
-    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({ topicId: '1' });
+    mockUseParam.mockReturnValue({ topicId: '1' });
 
     // Renders the component
     const router = createMemoryRouter([{ path: '*', element: <EditTopic /> }]);
@@ -525,11 +531,11 @@ describe('The EditTopic component', () => {
     expect(editorComponent).toHaveValue('text1');
 
     // Set data
-    userEvent.clear(titleComponent);
-    userEvent.type(titleComponent, 'new title 1');
+    await waitFor(() => userEvent.clear(titleComponent));
+    await waitFor(() => userEvent.type(titleComponent, 'new title 1'));
     expect(titleComponent).toHaveValue('new title 1');
-    userEvent.clear(editorComponent);
-    userEvent.type(editorComponent, 'new content 1');
+    await waitFor(() => userEvent.clear(editorComponent));
+    await waitFor(() => userEvent.type(editorComponent, 'new content 1'));
     expect(editorComponent).toHaveValue('new content 1');
 
     // Clear the fetch mock.
@@ -596,7 +602,7 @@ describe('The EditTopic component', () => {
     });
 
     // Mocks the path parameter in the URL to open topic creation page
-    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({ topicId: '1' });
+    mockUseParam.mockReturnValue({ topicId: '1' });
 
     // Renders the component
     const router = createMemoryRouter([{ path: '*', element: <EditTopic /> }]);
@@ -609,11 +615,11 @@ describe('The EditTopic component', () => {
     expect(editorComponent).toHaveValue('text1');
 
     // Set data
-    userEvent.clear(titleComponent);
-    userEvent.type(titleComponent, 'new title 1');
+    await waitFor(() => userEvent.clear(titleComponent));
+    await waitFor(() => userEvent.type(titleComponent, 'new title 1'));
     expect(titleComponent).toHaveValue('new title 1');
-    userEvent.clear(editorComponent);
-    userEvent.type(editorComponent, 'new content 1');
+    await waitFor(() => userEvent.clear(editorComponent));
+    await waitFor(() => userEvent.type(editorComponent, 'new content 1'));
     expect(editorComponent).toHaveValue('new content 1');
 
     // Clear the fetch mock.
@@ -672,7 +678,7 @@ describe('The EditTopic component', () => {
     });
 
     // Mocks the path parameter in the URL to open topic creation page
-    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({ topicId: '1' });
+    mockUseParam.mockReturnValue({ topicId: '1' });
 
     // Renders the component
     const router = createMemoryRouter([{ path: '*', element: <EditTopic /> }]);
@@ -685,11 +691,11 @@ describe('The EditTopic component', () => {
     expect(editorComponent).toHaveValue('text1');
 
     // Set data
-    userEvent.clear(titleComponent);
-    userEvent.type(titleComponent, 'new title 1');
+    await waitFor(() => userEvent.clear(titleComponent));
+    await waitFor(() => userEvent.type(titleComponent, 'new title 1'));
     expect(titleComponent).toHaveValue('new title 1');
-    userEvent.clear(editorComponent);
-    userEvent.type(editorComponent, 'new content 1');
+    await waitFor(() => userEvent.clear(editorComponent));
+    await waitFor(() => userEvent.type(editorComponent, 'new content 1'));
     expect(editorComponent).toHaveValue('new content 1');
 
     // Clear the fetch mock.
@@ -748,7 +754,7 @@ describe('The EditTopic component', () => {
     });
 
     // Mocks the path parameter in the URL to open topic creation page
-    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({ topicId: '1' });
+    mockUseParam.mockReturnValue({ topicId: '1' });
 
     // Renders the component
     const router = createMemoryRouter([{ path: '*', element: <EditTopic /> }]);
@@ -761,11 +767,11 @@ describe('The EditTopic component', () => {
     expect(editorComponent).toHaveValue('text1');
 
     // Set data
-    userEvent.clear(titleComponent);
-    userEvent.type(titleComponent, 'new title 1');
+    await waitFor(() => userEvent.clear(titleComponent));
+    await waitFor(() => userEvent.type(titleComponent, 'new title 1'));
     expect(titleComponent).toHaveValue('new title 1');
-    userEvent.clear(editorComponent);
-    userEvent.type(editorComponent, 'new content 1');
+    await waitFor(() => userEvent.clear(editorComponent));
+    await waitFor(() => userEvent.type(editorComponent, 'new content 1'));
     expect(editorComponent).toHaveValue('new content 1');
 
     // Clear the fetch mock.
@@ -821,7 +827,7 @@ describe('The EditTopic component', () => {
     });
 
     // Mocks the path parameter in the URL to open topic creation page
-    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({ topicId: '1' });
+    mockUseParam.mockReturnValue({ topicId: '1' });
 
     // Renders the component
     const router = createMemoryRouter([{ path: '*', element: <EditTopic /> }]);
@@ -834,11 +840,11 @@ describe('The EditTopic component', () => {
     expect(editorComponent).toHaveValue('text1');
 
     // Set data
-    userEvent.clear(titleComponent);
-    userEvent.type(titleComponent, 'new title 1');
+    await waitFor(() => userEvent.clear(titleComponent));
+    await waitFor(() => userEvent.type(titleComponent, 'new title 1'));
     expect(titleComponent).toHaveValue('new title 1');
-    userEvent.clear(editorComponent);
-    userEvent.type(editorComponent, 'new content 1');
+    await waitFor(() => userEvent.clear(editorComponent));
+    await waitFor(() => userEvent.type(editorComponent, 'new content 1'));
     expect(editorComponent).toHaveValue('new content 1');
 
     // Clear the fetch mock.
@@ -862,7 +868,7 @@ describe('The EditTopic component', () => {
 
   it('shows error if undefined topic ID', async () => {
     // Mocks the path parameter in the URL to open topic creation page
-    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({ topicId: undefined });
+    mockUseParam.mockReturnValue({ topicId: undefined });
 
     // Renders the component
     const router = createMemoryRouter([{ path: '*', element: <EditTopic /> }]);
@@ -880,7 +886,7 @@ describe('The EditTopic component', () => {
 
   it('shows error if BAD topic ID', async () => {
     // Mocks the path parameter in the URL to open topic creation page
-    jest.spyOn(ReactRouterDom, 'useParams').mockReturnValue({ topicId: 'BAD_TOPIC_ID' });
+    mockUseParam.mockReturnValue({ topicId: 'BAD_TOPIC_ID' });
 
     // Renders the component
     const router = createMemoryRouter([{ path: '*', element: <EditTopic /> }]);
